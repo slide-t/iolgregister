@@ -691,6 +691,26 @@
       .catch((err) => console.error("SW registration failed:", err));
   }
   </script>
+<!-- Welcome Modal -->
+<div id="welcomeModal" class="modal-overlay">
+  <div class="modal-content">
+    <img src="your-logo.png" alt="Logo" class="modal-logo" />
+    <h2>Welcome to Our Membership Registration</h2>
+    <p>Please follow the steps to complete your registration.</p>
+    <button onclick="closeModal()" class="start-btn">Start Registration</button>
+    <p class="modal-footer">&copy; 2025 Your Organization Name. All rights reserved.</p>
+  </div>
+</div>
+    <script>
+  window.onload = function () {
+    document.getElementById("welcomeModal").style.display = "flex";
+  };
+
+  function closeModal() {
+    document.getElementById("welcomeModal").style.display = "none";
+  }
+</script>
+  
 </body>
 </html>
 
