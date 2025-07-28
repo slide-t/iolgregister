@@ -2,6 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <!-- Meta -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#004080" />
+
+<!-- Manifest -->
+<link rel="manifest" href="manifest.json">
+
+<!-- Favicon / App Icons -->
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/icon-512.png">
+
+<!-- Register Service Worker -->
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js')
+      .then(reg => console.log('Service Worker registered ✅', reg))
+      .catch(err => console.error('Service Worker error ❌', err));
+  }
+</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IOLG Members Registration</title>
   <style>
