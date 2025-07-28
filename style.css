@@ -99,7 +99,8 @@ form { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
 
 label { font-weight: bold; }
 
-input[type="text"], input[type="date"], input[type="number"], input[type="email"], select { padding: 10px; border: 1px solid #ccc; border-radius: 6px; width: 100%; }
+input[type="text"], input[type="date"], input[type="number"], input[type="email"], select { padding: 10px; border: 1px solid #ccc; 
+                                                                                           border-radius: 6px; width: 100%; margin: 24px;}
 
 button { background-color: #f77f00; color: white; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; transition: background-color 0.3s ease; }
 
