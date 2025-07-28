@@ -1,46 +1,44 @@
-const CACHE_NAME = 'group-form-v1.1.2'; // update this version on changes
+const CACHE_NAME = 'iolg-cache-v1.1.1';
 const urlsToCache = [
-  './',
-  './',
-  './style.css', // include your stylesheet if any
-  './script.js', // include your JS file
-  './favicon.ico',
-  './manifest.json',
-  './admin.js',
-  './dashboard.html',
-  './admin.html,
-  './styles.css,
+  'index.html',
+  'admin.html',
+  'downloadable.html',
+  'manifest.json',
+  'style.css',
+  'script.js',
+  'icons/icon-192.png',
+  'icons/icon-512.png'
 ];
 
-// Install event
-self.addEventListener('install', event => {
+// Install
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
+    caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(urlsToCache);
     })
   );
-  self.skipWaiting(); // activate immediately
+  self.skipWaiting();
 });
 
-// Activate event
-self.addEventListener('activate', event => {
+// Activate
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then(keys =>
+    caches.keys().then((keyList) =>
       Promise.all(
-        keys.map(key => {
+        keyList.map((key) => {
           if (key !== CACHE_NAME) return caches.delete(key);
         })
       )
     )
   );
-  self.clients.claim(); // take control of all pages
+  self.clients.claim();
 });
 
-// Fetch event
-self.addEventListener('fetch', event => {
+// Fetch
+self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then(response =>
-      response || fetch(event.request)
-    )
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request);
+    })
   );
 });
