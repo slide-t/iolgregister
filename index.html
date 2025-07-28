@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>IOLG Members Registration</title>
+  <style>
+   * {
+     box-sizing: border-box;
+     margin:0;
+     padding:0;
+   }
+    body { font-family: Arial; padding: 20px; }
+    .form-group { margin-bottom: 15px; }
+    .hidden { display: none; }
+    .register-btn, .preview-btn, .print-btn {
+      padding: 10px 15px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+  h2 {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  p {
+    text-align: justify;
+    margin-top:20px;
+  }
+    table {
+      width: 100%; border-collapse: collapse; margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc; padding: 8px; text-align: left;
+    }
+    #preview-container  { 
+      display: none;
+      margin: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>IOLG Members Registration DATA</h2>
+
+    <div class="form-group">
+      <label for="state">Select State:</label>
+      <select id="state" required>
+        <option value="">-- Select State --</option>
+        <option value="ogun">Ogun State</option>
+      </select>
+    </div>
+
+    <div class="form-group hidden" id="lga-group">
+      <label for="lga">Select Local Government:</label>
+      <select id="lga" required></select>
+    </div>
+
+    <div class="form-group hidden" id="ward-group">
+      <label for="ward">Select Ward:</label>
+      <select id="ward" required></select>
+    </div>
+
+    <div class="form-group hidden" id="unit-group">
+      <label for="unit">Select Polling Unit:</label>
+      <select id="unit" required></select>
+    </div>
+
+    <form class="hidden" id="biodata-form">
+      <h3>Bio Data</h3>
+
+      <div class="form-group">
+        <label>Full Name:</label>
+        <input type="text" id="fullname" required />
+      </div>
+
+      <div class="form-group">
+        <label>Date of Birth:</label>
+        <input type="date" id="dob" required />
+      </div>
+
+      <div class="form-group">
+        <label>Age:</label>
+        <input type="text" id="age" disabled />
+      </div>
+
+      <div class="form-group">
+        <label>Phone Number:</label>
+        <input type="tel" id="phone" required />
+      </div>
+
+      <div class="form-group">
+        <label>Are you a registered voter?</label>
+        <select id="isVoter" required>
+          <option value="">-- Select --</option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+
+      <div class="form-group hidden" id="vin-group">
+        <label>Enter Voter Identification Number (VIN):</label>
+        <input type="text" id="vin" />
+      </div>
+
+      <div class="form-group">
+        <label>Are you a registered party member?</label>
+        <select id="isPartyMember" required>
+          <option value="">-- Select --</option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+
+      <div class="form-group hidden" id="party-id-group">
+        <label>Enter Party Membership ID:</label>
+        <input type="text" id="partyId" />
+      </div>
+
+      <div class="form-group">
+        <button type="submit" class="register-btn">Register Member</button>
+      </div>
+    </form>
+
+    <div class="form-group">
+      <button onclick="printPreview(this)">Preview</button>
+      <!-- <button onclick="printPreview()" class="preview-btn">📄 Preview Registered Members (PDF)</button>-->
+    </div>
+
+    <!-- Hidden Preview Area -->
+    <div id="preview-container">
+      <h3>Registered Members</h3>
+      <table id="preview-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>DOB</th>
+            <th>Age</th>
+            <th>Phone</th>
+            <th>LGA</th>
+            <th>Ward</th>
+            <th>Unit</th>
+            <th>VIN</th>
+            <th>Party ID</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const data = {
+      ogun: {
+        "Ijebu Ode": {
+      "Ward-1": [
+  "Beside Co-Operative Building (001 - Existing)",
+  "Emmanuel School I, Italupe (002 - Existing)",
+  "Moslem School, Isoku (003 - Existing)",
+  "Front of Talabi’s House, Olisa Street I (004 - Existing)",
+  "Imoru Road Junction (005 - Existing)",
+  "Oke-Ola Ilorin (006 - Existing)",
+  "Emmanuel School II (007 - Existing)",
+  "Front of Talabi’s House, Olisa Street II (008 - Existing)",
+  "Adjacent A.B Sunmola House, Ijagun Road (009 - New)",
+  "Beside 3A’s Hotel, Imoru Road (010 - New)",
+  "Moslem School II, Ondo Road (011 - New)"
+],
+"Ward-2": [
+  "Baptist Day School, Ereko (001 - Existing)",
+  "Front of Our Lady’s School (002 - Existing)",
+  "Front of Alhaji Kukoyi’s House (003 - Existing)",
+  "Opposite Itajana Mosque (004 - Existing)",
+  "State Hospital (005 - Existing)",
+  "Dental Centre (006 - Existing)",
+  "By Odo Esa Premier Mosque, Near Idiroko, Olisa (007 - New)",
+  "Saka Ashiru Junction via Mayomayo (008 - New)",
+  "Open Space by Olorungbebe Mosque (009 - New)",
+  "Jimileyin Junction, Adjacent Irepodun Mosque (010 - New)",
+  "Open Space at Oguntuga Four Junction (011 - New)"
+],
+"Ward-3": [
+  "Moslem School, Etitale I (001 - Existing)",
+  "Opp. Oloritun’s House (002 - Existing)",
+  "Front of Igboburo Mosque (003 - Existing)",
+  "Front of Balogun Kuku’s House (004 - Existing)",
+  "Isokun / Itaogbe Junction (005 - Existing)",
+  "Moslem School, Etitale II (006 - Existing)",
+  "Ahmmadiah Movement B/S, Araromi (007 - New)"
+],
+"Ward-4": [
+  "Old Wasimi School Hall (001 - Existing)",
+  "Joke Taiwo Pry. School (002 - Existing)",
+  "Balogun Kuku Road (003 - Existing)",
+  "Otubu Memorial School (004 - Existing)",
+  "Iyanro Mosque (005 - Existing)",
+  "Oke Aje, Back of Ajayi’s House (006 - Existing)",
+  "Open Space at Moborode / Gbelegbuwa Junction (007 - New)",
+  "Open Space at Itapakure / Olode Junction (008 - New)"
+]
+        }
+      }
+    };
+
+    const stateSelect = document.getElementById('state');
+    const lgaSelect = document.getElementById('lga');
+    const wardSelect = document.getElementById('ward');
+    const unitSelect = document.getElementById('unit');
+    const lgaGroup = document.getElementById('lga-group');
+    const wardGroup = document.getElementById('ward-group');
+    const unitGroup = document.getElementById('unit-group');
+    const form = document.getElementById('biodata-form');
+
+    stateSelect.addEventListener('change', () => {
+      const state = stateSelect.value;
+      lgaSelect.innerHTML = '<option value="">-- Select LGA --</option>';
+      wardSelect.innerHTML = '';
+      unitSelect.innerHTML = '';
+      if (state && data[state]) {
+        lgaGroup.classList.remove('hidden');
+        Object.keys(data[state]).forEach(lga =>
+          lgaSelect.innerHTML += `<option value="${lga}">${lga}</option>`
+        );
+      } else lgaGroup.classList.add('hidden');
+    });
+
+    lgaSelect.addEventListener('change', () => {
+      const state = stateSelect.value;
+      const lga = lgaSelect.value;
+      wardSelect.innerHTML = '<option value="">-- Select Ward --</option>';
+      if (data[state][lga]) {
+        wardGroup.classList.remove('hidden');
+        Object.keys(data[state][lga]).forEach(ward =>
+          wardSelect.innerHTML += `<option value="${ward}">${ward}</option>`
+        );
+      } else wardGroup.classList.add('hidden');
+    });
+
+    wardSelect.addEventListener('change', () => {
+      const state = stateSelect.value;
+      const lga = lgaSelect.value;
+      const ward = wardSelect.value;
+      unitSelect.innerHTML = '<option value="">-- Select Unit --</option>';
+      if (data[state][lga][ward]) {
+        unitGroup.classList.remove('hidden');
+        data[state][lga][ward].forEach(unit =>
+          unitSelect.innerHTML += `<option value="${unit}">${unit}</option>`
+        );
+      } else unitGroup.classList.add('hidden');
+    });
+
+    unitSelect.addEventListener('change', () => {
+      if (unitSelect.value) form.classList.remove('hidden');
+    });
+
+    // Age calculation
+    document.getElementById('dob').addEventListener('change', function () {
+      const dob = new Date(this.value);
+      const today = new Date();
+      let age = today.getFullYear() - dob.getFullYear();
+      const m = today.getMonth() - dob.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+      document.getElementById('age').value = age;
+    });
+
+    // VIN field toggle
+    document.getElementById('isVoter').addEventListener('change', function () {
+      document.getElementById('vin-group').classList.toggle('hidden', this.value !== 'yes');
+    });
+
+    // Party ID field toggle
+    document.getElementById('isPartyMember').addEventListener('change', function () {
+      document.getElementById('party-id-group').classList.toggle('hidden', this.value !== 'yes');
+    });
+
+    // Form submit
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const member = {
+        fullname: document.getElementById('fullname').value,
+        dob: document.getElementById('dob').value,
+        age: document.getElementById('age').value,
+        phone: document.getElementById('phone').value,
+        state: stateSelect.value,
+        lga: lgaSelect.value,
+        ward: wardSelect.value,
+        unit: unitSelect.value,
+        vin: document.getElementById('vin').value,
+        partyId: document.getElementById('partyId').value
+      };
+      const all = JSON.parse(localStorage.getItem('members') || '[]');
+      all.push(member);
+      localStorage.setItem('members', JSON.stringify(all));
+      alert("Member registered!");
+      location.reload(); // Auto refresh app
+    });
+
+    // Preview + Print PDF
+   /* function printPreview() {
+      const container = document.getElementById("preview-container");
+      const tableBody = container.querySelector("tbody");
+      const members = JSON.parse(localStorage.getItem("members") || "[]");
+      tableBody.innerHTML = "";
+      members.forEach((m, i) => {
+        const row = `
+        
+         <tr>
+            <td>${i + 1}</td>
+            <td>${m.fullname}</td>
+            <td>${m.dob}</td>
+            <td>${m.age}</td>
+            <td>${m.phone}</td>
+            <td>${m.lga}</td>
+            <td>${m.ward}</td>
+            <td>${m.unit}</td>
+            <td>${m.vin}</td>
+            <td>${m.partyId}</td>
+          </tr>
+        `;
+        tableBody.innerHTML += row;
+      });
+      container.style.display = "block";
+      setTimeout(() => window.print(), 500);
+    }*/
+  function printPreview(btn) {
+  const container = document.getElementById("preview-container");
+  const tableBody = container.querySelector("tbody");
+
+  if (container.style.display === "block") {
+    container.style.display = "none";
+    btn.innerText = "Preview";
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+
+  const members = JSON.parse(localStorage.getItem("members") || "[]");
+  tableBody.innerHTML = "";
+
+  members.forEach((m, i) => {
+    const row = `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${m.fullname ?? ""}</td>
+        <td>${m.dob ?? ""}</td>
+        <td>${m.age ?? ""}</td>
+        <td>${m.phone ?? ""}</td>
+        <td>${m.lga ?? ""}</td>
+        <td>${m.ward ?? ""}</td>
+        <td>${m.unit ?? ""}</td>
+        <td>${m.vin ?? ""}</td>
+        <td>${m.partyId ?? ""}</td>
+      </tr>
+    `;
+    tableBody.innerHTML += row;
+  });
+
+  container.style.display = "block";
+  container.scrollIntoView({ behavior: 'smooth' });
+  btn.innerText = "Close Preview";
+}
+  </script>
+</body>
+</html>
+
+
+
+
+<!--
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Group Membership Registration</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+    .hidden {
+      display: none;
+    }
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>Group Membership Registration</h2>
+  <div class="form-group">
+    <label for="state">Select State:</label>
+    <select id="state" required>
+      <option value="">-- Select State --</option>
+      <option value="ogun">Ogun State</option>
+    </select>
+  </div>  <div class="form-group hidden" id="lga-group">
+    <label for="lga">Select Local Government:</label>
+    <select id="lga" required></select>
+  </div>  <div class="form-group hidden" id="ward-group">
+    <label for="ward">Select Ward:</label>
+    <select id="ward" required></select>
+  </div>  <div class="form-group hidden" id="unit-group">
+    <label for="unit">Select Polling Unit:</label>
+    <select id="unit" required></select>
+  </div>  <form class="hidden" id="biodata-form">
+    <h3>Bio Data</h3><div class="form-group">
+  <label>Full Name:</label>
+  <input type="text" id="fullname" required />
+</div>
+
+<div class="form-group">
+  <label>Date of Birth:</label>
+  <input type="date" id="dob" required />
+</div>
+
+<div class="form-group">
+  <label>Age:</label>
+  <input type="text" id="age" disabled />
+</div>
+
+<div class="form-group">
+  <label>Phone Number:</label>
+  <input type="tel" id="phone" required />
+</div>
+
+<div class="form-group">
+  <label>Are you a registered voter?</label>
+  <select id="isVoter" required>
+    <option value="">-- Select --</option>
+    <option value="yes">Yes</option>
+    <option value="no">No</option>
+  </select>
+</div>
+
+<div class="form-group hidden" id="vin-group">
+  <label>Enter Voter Identification Number (VIN):</label>
+  <input type="text" id="vin" />
+</div>
+
+<div class="form-group">
+  <label>Are you a registered party member?</label>
+  <select id="isPartyMember" required>
+    <option value="">-- Select --</option>
+    <option value="yes">Yes</option>
+    <option value="no">No</option>
+  </select>
+</div>
+
+<div class="form-group hidden" id="party-id-group">
+  <label>Enter Party Membership ID:</label>
+  <input type="text" id="partyId" />
+</div>
+
+<div class="form-group">
+  <button type="submit" class="register-btn">Register Member</button>
+</div>
+
+  </form><button onclick="printPDF()">Print as PDF</button> <button onclick="showPreview()">Preview Registered Members</button>
+
+  <div id="preview" class="hidden">
+    <h3>Registered Members</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Age</th>
+          <th>Phone</th>
+          <th>Ward</th>
+          <th>Unit</th>
+        </tr>
+      </thead>
+      <tbody id="member-list"></tbody>
+    </table>
+  </div>
+</div><script>
+  const ogunLGAs = {
+    "Abeokuta South": ["Ward 1", "Ward 2"],
+    "Ijebu Ode": ["Ward A", "Ward B"]
+  };
+
+  const pollingUnits = {
+    "Ward 1": ["PU 001", "PU 002"],
+    "Ward 2": ["PU 101"],
+    "Ward A": ["PU A01"],
+    "Ward B": ["PU B01"]
+  };
+
+  document.getElementById("state").addEventListener("change", () => {
+    const lgaSelect = document.getElementById("lga");
+    const lgaGroup = document.getElementById("lga-group");
+    const selectedState = document.getElementById("state").value;
+
+    if (selectedState === "ogun") {
+      lgaGroup.classList.remove("hidden");
+      lgaSelect.innerHTML = '<option value="">-- Select LGA --</option>';
+      Object.keys(ogunLGAs).forEach(lga => {
+        const opt = document.createElement("option");
+        opt.value = lga;
+        opt.textContent = lga;
+        lgaSelect.appendChild(opt);
+      });
+    }
+  });
+
+  document.getElementById("lga").addEventListener("change", () => {
+    const wardGroup = document.getElementById("ward-group");
+    const wardSelect = document.getElementById("ward");
+    const selectedLGA = document.getElementById("lga").value;
+
+    if (selectedLGA && ogunLGAs[selectedLGA]) {
+      wardGroup.classList.remove("hidden");
+      wardSelect.innerHTML = '<option value="">-- Select Ward --</option>';
+      ogunLGAs[selectedLGA].forEach(ward => {
+        const opt = document.createElement("option");
+        opt.value = ward;
+        opt.textContent = ward;
+        wardSelect.appendChild(opt);
+      });
+    }
+  });
+
+  document.getElementById("ward").addEventListener("change", () => {
+    const unitGroup = document.getElementById("unit-group");
+    const unitSelect = document.getElementById("unit");
+    const selectedWard = document.getElementById("ward").value;
+
+    if (pollingUnits[selectedWard]) {
+      unitGroup.classList.remove("hidden");
+      unitSelect.innerHTML = '<option value="">-- Select Unit --</option>';
+      pollingUnits[selectedWard].forEach(unit => {
+        const opt = document.createElement("option");
+        opt.value = unit;
+        opt.textContent = unit;
+        unitSelect.appendChild(opt);
+      });
+    }
+    document.getElementById("biodata-form").classList.remove("hidden");
+  });
+
+  document.getElementById("dob").addEventListener("change", () => {
+    const dob = new Date(document.getElementById("dob").value);
+    const ageField = document.getElementById("age");
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const m = today.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+      age--;
+    }
+    ageField.value = age;
+  });
+
+  document.getElementById("isVoter").addEventListener("change", (e) => {
+    document.getElementById("vin-group").classList.toggle("hidden", e.target.value !== "yes");
+  });
+
+  document.getElementById("isPartyMember").addEventListener("change", (e) => {
+    document.getElementById("party-id-group").classList.toggle("hidden", e.target.value !== "yes");
+  });
+
+  const members = [];
+  document.getElementById("biodata-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const member = {
+      name: document.getElementById("fullname").value,
+      age: document.getElementById("age").value,
+      phone: document.getElementById("phone").value,
+      ward: document.getElementById("ward").value,
+      unit: document.getElementById("unit").value
+    };
+    members.push(member);
+    alert("Member registered successfully!");
+    document.getElementById("biodata-form").reset();
+    document.getElementById("age").value = "";
+  });
+
+  function showPreview() {
+    const previewDiv = document.getElementById("preview");
+    const list = document.getElementById("member-list");
+    list.innerHTML = "";
+    members.forEach((m, i) => {
+      list.innerHTML += `<tr><td>${i + 1}</td><td>${m.name}</td><td>${m.age}</td><td>${m.phone}</td><td>${m.ward}</td><td>${m.unit}</td></tr>`;
+    });
+    previewDiv.classList.remove("hidden");
+  }
+
+  function printPDF() {
+    window.print();
+  }
+</script></body>
+</html>
+
+
+
+
+<!--
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Group Registration</title>
+  <style>
+    .hidden { display: none; }
+    .container { max-width: 500px; margin: auto; padding: 20px; font-family: Arial; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; }
+    input, select, button { width: 100%; padding: 8px; box-sizing: border-box; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>Group Membership Registration</h2>
+
+  <!-- Location Fields --
+  <div class="form-group">
+    <label for="state">Select State:</label>
+    <select id="state" required>
+      <option value="">-- Select State --</option>
+      <option value="ogun">Ogun State</option>
+    </select>
+  </div>
+
+  <div class="form-group hidden" id="lga-group">
+    <label for="lga">Select Local Government:</label>
+    <select id="lga" required></select>
+  </div>
+
+  <div class="form-group hidden" id="ward-group">
+    <label for="ward">Select Ward:</label>
+    <select id="ward" required></select>
+  </div>
+
+  <div class="form-group hidden" id="unit-group">
+    <label for="unit">Select Polling Unit:</label>
+    <select id="unit" required></select>
+  </div>
+
+  <!-- Bio Data Form --
+  <form class="hidden" id="biodata-form">
+    <h3>Bio Data</h3>
+
+    <div class="form-group">
+      <label>Full Name:</label>
+      <input type="text" id="fullname" required />
+    </div>
+
+    <div class="form-group">
+      <label>Date of Birth:</label>
+      <input type="date" id="dob" required />
+    </div>
+
+    <div class="form-group">
+      <label>Age:</label>
+      <input type="text" id="age" disabled />
+    </div>
+
+    <div class="form-group">
+      <label>Phone Number:</label>
+      <input type="tel" id="phone" required />
+    </div>
+
+    <div class="form-group">
+      <label>Are you a registered voter?</label>
+      <select id="isVoter" required>
+        <option value="">-- Select --</option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+    </div>
+
+    <div class="form-group hidden" id="vin-group">
+      <label>Enter Voter Identification Number (VIN):</label>
+      <input type="text" id="vin" />
+    </div>
+
+    <div class="form-group">
+      <label>Are you a registered party member?</label>
+      <select id="isPartyMember" required>
+        <option value="">-- Select --</option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+    </div>
+
+    <div class="form-group hidden" id="party-id-group">
+      <label>Enter Party Membership ID:</label>
+      <input type="text" id="partyId" />
+    </div>
+
+    <div class="form-group">
+      <button type="submit" class="register-btn">Register Member</button>
+    </div>
+  </form>
+</div>
+
+<script>
+const data = {
+  ogun: {
+    "Abeokuta North": {
+      "Ikereku Ward-1": [
+        "Ago Ododo Ojuferewa", "Idomapa", "Ikereku Abeke", "Ikereku Abeokuta",
+        "Ikereku Ita Apahun", "Ikereku Oloti", "Ikereku Oke Eri", "Ilawo"
+      ],
+      "Ikija Ward-2": ["Adedotun", "AGO Odo-oke Eri", "Ikija", "Ilagun Isale Ogun"],
+      "AGO-OK0 WARD-3": ["Ago Oko", "Araromi Ita Kilosin", "Balogun", "Ifa Kiwoshin", "Uta Morin", "Sapon Oju Ogbara"],
+      "Totoro": ["Totoro Hall", "Lafenwa Primary School"],
+      "Oke-Ago-Owu": ["Oke-Ago-Owu Hall", "CAC Primary School"]
+    }
+  }
+};
+
+// Select Elements
+const stateEl = document.getElementById('state');
+const lgaEl = document.getElementById('lga');
+const wardEl = document.getElementById('ward');
+const unitEl = document.getElementById('unit');
+
+stateEl.addEventListener('change', () => {
+  const state = stateEl.value;
+  lgaEl.innerHTML = '<option value="">-- Select LGA --</option>';
+  wardEl.innerHTML = '<option value="">-- Select Ward --</option>';
+  unitEl.innerHTML = '<option value="">-- Select Unit --</option>';
+  if (data[state]) {
+    document.getElementById('lga-group').classList.remove('hidden');
+    Object.keys(data[state]).forEach(lga => {
+      lgaEl.innerHTML += `<option value="${lga}">${lga}</option>`;
+    });
+  }
+});
+
+lgaEl.addEventListener('change', () => {
+  const state = stateEl.value;
+  const lga = lgaEl.value;
+  wardEl.innerHTML = '<option value="">-- Select Ward --</option>';
+  unitEl.innerHTML = '<option value="">-- Select Unit --</option>';
+  if (data[state][lga]) {
+    document.getElementById('ward-group').classList.remove('hidden');
+    Object.keys(data[state][lga]).forEach(ward => {
+      wardEl.innerHTML += `<option value="${ward}">${ward}</option>`;
+    });
+  }
+});
+
+wardEl.addEventListener('change', () => {
+  const state = stateEl.value;
+  const lga = lgaEl.value;
+  const ward = wardEl.value;
+  unitEl.innerHTML = '<option value="">-- Select Unit --</option>';
+  if (data[state][lga][ward]) {
+    document.getElementById('unit-group').classList.remove('hidden');
+    data[state][lga][ward].forEach(unit => {
+      unitEl.innerHTML += `<option value="${unit}">${unit}</option>`;
+    });
+  }
+  document.getElementById('biodata-form').classList.remove('hidden');
+});
+
+// Auto Calculate Age
+document.getElementById('dob').addEventListener('change', () => {
+  const dob = new Date(document.getElementById('dob').value);
+  const today = new Date();
+  let age = today.getFullYear() - dob.getFullYear();
+  const month = today.getMonth() - dob.getMonth();
+  if (month < 0 || (month === 0 && today.getDate() < dob.getDate())) age--;
+  document.getElementById('age').value = age;
+});
+
+// Conditional Fields
+document.getElementById('isVoter').addEventListener('change', (e) => {
+  document.getElementById('vin-group').classList.toggle('hidden', e.target.value !== 'yes');
+});
+
+document.getElementById('isPartyMember').addEventListener('change', (e) => {
+  document.getElementById('party-id-group').classList.toggle('hidden', e.target.value !== 'yes');
+});
+
+// Handle Form Submission
+document.getElementById('biodata-form').addEventListener('submit', function (e) {
+  e.preventDefault();
+  const formData = {
+    state: stateEl.value,
+    lga: lgaEl.value,
+    ward: wardEl.value,
+    unit: unitEl.value,
+    fullname: document.getElementById('fullname').value,
+    dob: document.getElementById('dob').value,
+    age: document.getElementById('age').value,
+    phone: document.getElementById('phone').value,
+    isVoter: document.getElementById('isVoter').value,
+    vin: document.getElementById('vin').value,
+    isPartyMember: document.getElementById('isPartyMember').value,
+    partyId: document.getElementById('partyId').value
+  };
+
+  console.log("Registered Member:", formData);
+  alert('Registration successful! (Check console for data)');
+  this.reset();
+});
+</script>
+ 
+<!-- 📥 Download Button -->
+
+  <a href="admin.html" target="_blank" class="print-btn" style="text-decoration:none;color:white; padding:10px 20px; border:none; border-radius:5px; cursor:pointer; margin-top: 20px;">Preview/Download Pdf</a>
+  
+  <!--
+  
+  <button id="download-pdf-btn" style="background-color:#28a745; color:white; padding:10px 20px; border:none; border-radius:5px; cursor:pointer; margin-top: 20px;">
+  
+  📥 Download Member Data (PDF)
+</button>
+  -->
+
+<!-- 📊 Table for Print -->
+<table id="member-table" class="hidden">
+  <thead>
+    <tr>
+      <th>S/N</th>
+      <th>Full Name</th>
+      <th>Phone</th>
+      <th>Gender</th>
+      <th>State</th>
+      <th>LGA</th>
+      <th>Ward</th>
+      <th>Polling Unit</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<!-- Footer Note -->
+<p class="note">Only authorized Ward Secretaries or Chairmen can register members from their own ward.</p>
+<p><a href="admin.html">Go to Admin Dashboard</a></p>
+
+<!-- jsPDF CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+  // DOM References
+  const isPartyMember = document.getElementById("isPartyMember");
+  const partyIdGroup = document.getElementById("party-id-group");
+  const pollingUnitGroup = document.getElementById("pollingUnit-group");
+  const bioData = document.getElementById("bioData");
+  const pollingUnit = document.getElementById("pollingUnit");
+  const form = document.getElementById("registrationForm");
+  const tableBody = document.getElementById("member-table").querySelector("tbody");
+  const memberTable = document.getElementById("member-table");
+
+  // Show form when 'Yes' is selected
+  isPartyMember.addEventListener("change", () => {
+    if (isPartyMember.value === "yes") {
+      partyIdGroup.classList.remove("hidden");
+      pollingUnitGroup.classList.remove("hidden");
+    } else {
+      partyIdGroup.classList.add("hidden");
+      pollingUnitGroup.classList.add("hidden");
+      bioData.classList.add("hidden");
+    }
+  });
+
+  // Show biodata after polling unit selected
+  pollingUnit.addEventListener("change", () => {
+    if (pollingUnit.value) {
+      bioData.classList.remove("hidden");
+    } else {
+      bioData.classList.add("hidden");
+    }
+  });
+
+  // Auto-calculate age
+  document.getElementById("dob").addEventListener("change", function () {
+    const dob = new Date(this.value);
+    const today = new Date();
+    const age = today.getFullYear() - dob.getFullYear();
+    document.getElementById("age").value = age;
+  });
+
+  // Handle Form Submission
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const member = {
+      fullName: document.getElementById("fullName").value,
+      phoneNumber: document.getElementById("phoneNumber").value,
+      gender: document.getElementById("gender").value,
+      state: document.getElementById("state").value,
+      lga: document.getElementById("lga").value,
+      ward: document.getElementById("ward").value,
+      unit: document.getElementById("pollingUnit").value,
+      age: document.getElementById("age").value,
+    };
+
+    const members = JSON.parse(localStorage.getItem("members") || "[]");
+    members.push(member);
+    localStorage.setItem("members", JSON.stringify(members));
+
+    alert("Member Registered Successfully!");
+
+    form.reset();
+    partyIdGroup.classList.add("hidden");
+    pollingUnitGroup.classList.add("hidden");
+    bioData.classList.add("hidden");
+  });
+
+  // 📥 Generate PDF
+  document.getElementById("download-pdf-btn").addEventListener("click", () => {
+    const password = prompt("Enter admin password to download data:");
+    if (password !== "admin123") return alert("Access Denied");
+
+    const members = JSON.parse(localStorage.getItem("members") || "[]");
+    if (members.length === 0) return alert("No member data found.");
+
+    tableBody.innerHTML = "";
+    members.forEach((m, i) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${i + 1}</td>
+        <td>${m.fullName}</td>
+        <td>${m.phoneNumber}</td>
+        <td>${m.gender}</td>
+        <td>${m.state}</td>
+        <td>${m.lga}</td>
+        <td>${m.ward}</td>
+        <td>${m.unit}</td>
+        <td>${m.age}</td>
+      `;
+      tableBody.appendChild(row);
+    });
+    memberTable.classList.remove("hidden");
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: "landscape" });
+    doc.text("Registered Members", 14, 10);
+    doc.autoTable({ html: "#member-table", startY: 20 });
+    doc.save("members.pdf");
+  });
+</script>
+  
+</body>
+</html>
+
+
+
+<!--
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Voter Registration</title>
+  <style>
+    body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+    h2 { text-align: center; }
+    select, input { padding: 8px; margin: 5px 0; width: 100%; }
+    #biodataForm { display: none; margin-top: 20px; }
+    button { padding: 10px 15px; margin: 10px 5px; cursor: pointer; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+<h2>Community Member Registration</h2>
+
+<div id="selectionArea">
+  <label for="state">State:</label>
+  <select id="state">
+    <option value="">--Select State--</option>
+    <option value="ogun">Ogun</option>
+  </select>
+
+  <label for="lga">LGA:</label>
+  <select id="lga" disabled>
+    <option value="">--Select LGA--</option>
+  </select>
+
+  <label for="ward">Ward:</label>
+  <select id="ward" disabled>
+    <option value="">--Select Ward--</option>
+  </select>
+
+  <label for="pollingUnit">Polling Unit:</label>
+  <select id="pollingUnit" disabled>
+    <option value="">--Select Polling Unit--</option>
+  </select>
+</div>
+
+<form id="biodataForm">
+  <h3>Biodata Registration</h3>
+  <input type="text" id="fullname" placeholder="Full Name" required />
+  <input type="text" id="age" placeholder="Age" required />
+  <input type="text" id="occupation" placeholder="Occupation" required />
+  <button type="submit">Register Member</button>
+</form>
+
+<button onclick="generatePDF()">Download PDF</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const data = {
+  ogun: {
+    "Abeokuta North": {
+      "Ikereku Ward-1": ["Ago Ododo Ojuferewa", "Idomapa", "Ikereku Abeke", "Ikereku Abeokuta",
+          "Ikereku Ita Apahun", "Ikereku Oloti", "Ikereku Oke Eri", "Ilawo"],
+      "Ikija Ward-2": ["Adedotun", "AGO Odo-oke Eri", "Ikija", "Ilagun Isale Ogun"],
+      "AGO-OK0 WARD-3": ["Ago Oko", "Araromi Ita Kilosin", "Balogun", "Ifa Kiwoshin", "Uta Morin", "Sapon Oju Ogbara"],
+      "Totoro": ["Totoro Hall", "Lafenwa Primary School"],
+      "Oke-Ago-Owu": ["Oke-Ago-Owu Hall", "CAC Primary School"] 
+    }
+  }
+};
+
+const stateSelect = document.getElementById("state");
+const lgaSelect = document.getElementById("lga");
+const wardSelect = document.getElementById("ward");
+const pollingSelect = document.getElementById("pollingUnit");
+const form = document.getElementById("biodataForm");
+
+stateSelect.addEventListener("change", function() {
+  const state = this.value;
+  resetSelect(lgaSelect);
+  resetSelect(wardSelect);
+  resetSelect(pollingSelect);
+  form.style.display = "none";
+
+  if (data[state]) {
+    lgaSelect.disabled = false;
+    for (const lga in data[state]) {
+      lgaSelect.innerHTML += `<option value="${lga}">${lga}</option>`;
+    }
+  }
+});
+
+lgaSelect.addEventListener("change", function () {
+  const state = stateSelect.value;
+  const lga = this.value;
+  resetSelect(wardSelect);
+  resetSelect(pollingSelect);
+  form.style.display = "none";
+
+  if (data[state][lga]) {
+    wardSelect.disabled = false;
+    for (const ward in data[state][lga]) {
+      wardSelect.innerHTML += `<option value="${ward}">${ward}</option>`;
+    }
+  }
+});
+
+wardSelect.addEventListener("change", function () {
+  const state = stateSelect.value;
+  const lga = lgaSelect.value;
+  const ward = this.value;
+  resetSelect(pollingSelect);
+  form.style.display = "none";
+
+  if (data[state][lga][ward]) {
+    pollingSelect.disabled = false;
+    data[state][lga][ward].forEach(unit => {
+      pollingSelect.innerHTML += `<option value="${unit}">${unit}</option>`;
+    });
+  }
+});
+
+pollingSelect.addEventListener("change", function () {
+  form.style.display = "block";
+});
+
+form.addEventListener("submit", function (e) {
+  e.preventDefault();
+  const record = {
+    state: stateSelect.value,
+    lga: lgaSelect.value,
+    ward: wardSelect.value,
+    unit: pollingSelect.value,
+    name: document.getElementById("fullname").value,
+    age: document.getElementById("age").value,
+    occupation: document.getElementById("occupation").value,
+  };
+
+  let all = JSON.parse(localStorage.getItem("members")) || [];
+  all.push(record);
+  localStorage.setItem("members", JSON.stringify(all));
+  alert("Member registered!");
+  form.reset();
+});
+
+function resetSelect(select) {
+  select.innerHTML = `<option value="">--Select--</option>`;
+  select.disabled = true;
+}
+
+async function generatePDF() {
+  const username = prompt("Enter Admin Username:");
+  const password = prompt("Enter Admin Password:");
+  if (username !== "admin" || password !== "1234") {
+    alert("Incorrect credentials!");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const members = JSON.parse(localStorage.getItem("members")) || [];
+
+  doc.setFontSize(14);
+  doc.text("Community Registered Members", 20, 15);
+
+  let y = 25;
+  members.forEach((m, i) => {
+    const entry = `${i + 1}. ${m.name}, Age: ${m.age}, ${m.occupation}, Unit: ${m.unit}, Ward: ${m.ward}, LGA: ${m.lga}`;
+    doc.text(entry, 10, y);
+    y += 10;
+    if (y > 270) {
+      doc.addPage();
+      y = 20;
+    }
+  });
+
+  doc.save("community_members.pdf");
+}
+</script>
+</body>
+</html>
+
+
+
+<!--
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Group Membership Registration</title>
+  -->
+  <style>
+   /* body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }*/
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .hidden {
+      display: none;
+    }
+    .print-btn {
+      background: green;
+      margin-top: 10px;
+    }
+  </style>
+  <!-- 
+</head>
+<body>
+  <div class="container">
+    <h2>Group Membership Registration</h2><div class="form-group">
+  <label for="state">Select State:</label>
+  <select id="state" required>
+    <option value="">-- Select State --</option>
+    <option value="ogun">Ogun State</option>
+  </select>
+</div>
+
+<div class="form-group hidden" id="lga-group">
+  <label for="lga">Select Local Government:</label>
+  <select id="lga" required></select>
+</div>
+
+<div class="form-group hidden" id="ward-group">
+  <label for="ward">Select Ward:</label>
+  <select id="ward" required></select>
+</div>
+
+<div class="form-group hidden" id="unit-group">
+  <label for="unit">Select Polling Unit:</label>
+  <select id="unit" required></select>
+</div>
+
+<form class="hidden" id="biodata-form">
+  <h3>Bio Data</h3>
+
+  <div class="form-group">
+    <label>Full Name:</label>
+    <input type="text" id="fullname" required />
+  </div>
+
+  <div class="form-group">
+    <label>Date of Birth:</label>
+    <input type="date" id="dob" required />
+  </div>
+
+  <div class="form-group">
+    <label>Age:</label>
+    <input type="text" id="age" disabled />
+  </div>
+
+  <div class="form-group">
+    <label>Phone Number:</label>
+    <input type="tel" id="phone" required />
+  </div>
+
+  <div class="form-group">
+    <label>Are you a registered voter?</label>
+    <select id="isVoter" required>
+      <option value="">-- Select --</option>
+      <option value="yes">Yes</option>
+      <option value="no">No</option>
+    </select>
+  </div>
+
+  <div class="form-group hidden" id="vin-group">
+    <label>Enter Voter Identification Number (VIN):</label>
+    <input type="text" id="vin" />
+  </div>
+
+  <div class="form-group">
+    <label>Are you a registered party member?</label>
+    <select id="isPartyMember" required>
+      <option value="">-- Select --</option>
+      <option value="yes">Yes</option>
+      <option value="no">No</option>
+    </select>
+  </div>
+
+  <div class="form-group hidden" id="party-id-group">
+    <label>Enter Party Membership ID:</label>
+    <input type="text" id="partyId" />
+  </div>
+
+  <div class="form-group">
+    <button type="submit" class="register-btn">Register Member</button>
+  </div>
+</form>
+
+<button class="print-btn" onclick="handlePrint()">Download PDF (Admin Only)</button>
+
+  </div> 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+ </script>
+  <script>
+    // JavaScript logic will be added here after this base structure is complete
+  const isPartyMember = document.getElementById("isPartyMember");
+    const partyIdGroup = document.getElementById("party-id-group");
+    const pollingUnitGroup = document.getElementById("pollingUnit-group");
+    const pollingUnit = document.getElementById("pollingUnit");
+    const bioData = document.getElementById("bioData");
+    const form = document.getElementById("registrationForm");
+    const table = document.getElementById("member-table").querySelector("tbody");
+    const memberTable = document.getElementById("member-table");
+
+    isPartyMember.addEventListener("change", () => {
+      if (isPartyMember.value === "yes") {
+        partyIdGroup.classList.remove("hidden");
+        pollingUnitGroup.classList.remove("hidden");
+      } else {
+        partyIdGroup.classList.add("hidden");
+        pollingUnitGroup.classList.add("hidden");
+        bioData.classList.add("hidden");
+      }
+    });
+
+    pollingUnit.addEventListener("change", () => {
+      if (pollingUnit.value) {
+        bioData.classList.remove("hidden");
+      } else {
+        bioData.classList.add("hidden");
+      }
+    });
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const fullName = document.getElementById("fullName").value;
+      const phoneNumber = document.getElementById("phoneNumber").value;
+      const gender = document.getElementById("gender").value;
+      const unit = pollingUnit.value;
+      const members = JSON.parse(localStorage.getItem("members") || "[]");
+      members.push({ fullName, phoneNumber, gender, unit });
+      localStorage.setItem("members", JSON.stringify(members));
+      alert("Member Registered Successfully!");
+      form.reset();
+      partyIdGroup.classList.add("hidden");
+      pollingUnitGroup.classList.add("hidden");
+      bioData.classList.add("hidden");
+    });
+
+    document.getElementById("download-pdf-btn").addEventListener("click", () => {
+      const password = prompt("Enter admin password to download data:");
+      if (password !== "admin123") return alert("Access Denied");
+
+      const members = JSON.parse(localStorage.getItem("members") || "[]");
+      if (members.length === 0) return alert("No member data found.");
+
+      table.innerHTML = "";
+      members.forEach((m, i) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${i + 1}</td><td>${m.fullName}</td><td>${m.phoneNumber}</td><td>${m.gender}</td><td>${m.unit}</td>`;
+        table.appendChild(row);
+      });
+      memberTable.classList.remove("hidden");
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: "landscape" });
+      doc.text("Registered Members", 14, 10);
+      doc.autoTable({ html: "#member-table", startY: 20 });
+      doc.save("members.pdf");
+    });
+  
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+<!--
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Member Registration</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .register-btn {
+      background-color: #007bff;
+      color: white;
+    }
+    .hidden {
+      display: none;
+    }
+    #member-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    #member-table th, #member-table td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    #member-table th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <form id="registrationForm">
+      <div class="form-group">
+        <label>Are you a registered party member?</label>
+        <select id="isPartyMember" required>
+          <option value="">-- Select --</option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
+      </div><div class="form-group hidden" id="party-id-group">
+    <label>Enter Party Membership ID:</label>
+    <input type="text" id="partyId" />
+  </div>
+
+  <div class="form-group hidden" id="pollingUnit-group">
+    <label>Select Polling Unit:</label>
+    <select id="pollingUnit">
+      <option value="">-- Select Polling Unit --</option>
+      <option value="PU001">PU001</option>
+      <option value="PU002">PU002</option>
+    </select>
+  </div>
+
+  <div id="bioData" class="hidden">
+    <div class="form-group">
+      <label>Full Name:</label>
+      <input type="text" id="fullName" required />
+    </div>
+
+    <div class="form-group">
+      <label>Phone Number:</label>
+      <input type="text" id="phoneNumber" required />
+    </div>
+
+    <div class="form-group">
+      <label>Gender:</label>
+      <select id="gender">
+        <option value="">-- Select Gender --</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <button type="submit" class="register-btn">Register Member</button>
+    </div>
+  </div>
+</form>
+
+<button id="download-pdf-btn" style="background-color:#28a745; color:white; padding:10px 20px; border:none; border-radius:5px; cursor:pointer;">
+  📥 Download Member Data (PDF)
+</button>
+
+<table id="member-table" class="hidden">
+  <thead>
+    <tr>
+      <th>S/N</th>
+      <th>Full Name</th>
+      <th>Phone</th>
+      <th>Gender</th>
+      <th>Polling Unit</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<p class="note">
+  Only authorized Ward Secretaries or Chairmen can register members from their own ward.
+</p>
+<p><a href="admin.html">Go to Admin Dashboard</a></p>
+
+  </div> 
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+ </script> 
+<script>
+    const isPartyMember = document.getElementById("isPartyMember");
+    const partyIdGroup = document.getElementById("party-id-group");
+    const pollingUnitGroup = document.getElementById("pollingUnit-group");
+    const pollingUnit = document.getElementById("pollingUnit");
+    const bioData = document.getElementById("bioData");
+    const form = document.getElementById("registrationForm");
+    const table = document.getElementById("member-table").querySelector("tbody");
+    const memberTable = document.getElementById("member-table");
+
+    isPartyMember.addEventListener("change", () => {
+      if (isPartyMember.value === "yes") {
+        partyIdGroup.classList.remove("hidden");
+        pollingUnitGroup.classList.remove("hidden");
+      } else {
+        partyIdGroup.classList.add("hidden");
+        pollingUnitGroup.classList.add("hidden");
+        bioData.classList.add("hidden");
+      }
+    });
+
+    pollingUnit.addEventListener("change", () => {
+      if (pollingUnit.value) {
+        bioData.classList.remove("hidden");
+      } else {
+        bioData.classList.add("hidden");
+      }
+    });
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const fullName = document.getElementById("fullName").value;
+      const phoneNumber = document.getElementById("phoneNumber").value;
+      const gender = document.getElementById("gender").value;
+      const unit = pollingUnit.value;
+      const members = JSON.parse(localStorage.getItem("members") || "[]");
+      members.push({ fullName, phoneNumber, gender, unit });
+      localStorage.setItem("members", JSON.stringify(members));
+      alert("Member Registered Successfully!");
+      form.reset();
+      partyIdGroup.classList.add("hidden");
+      pollingUnitGroup.classList.add("hidden");
+      bioData.classList.add("hidden");
+    });
+
+    document.getElementById("download-pdf-btn").addEventListener("click", () => {
+      const password = prompt("Enter admin password to download data:");
+      if (password !== "admin123") return alert("Access Denied");
+
+      const members = JSON.parse(localStorage.getItem("members") || "[]");
+      if (members.length === 0) return alert("No member data found.");
+
+      table.innerHTML = "";
+      members.forEach((m, i) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${i + 1}</td><td>${m.fullName}</td><td>${m.phoneNumber}</td><td>${m.gender}</td><td>${m.unit}</td>`;
+        table.appendChild(row);
+      });
+      memberTable.classList.remove("hidden");
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: "landscape" });
+      doc.text("Registered Members", 14, 10);
+      doc.autoTable({ html: "#member-table", startY: 20 });
+      doc.save("members.pdf");
+    });
+  </script></body>
+</html>
