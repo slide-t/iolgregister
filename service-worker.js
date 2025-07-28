@@ -1,4 +1,4 @@
-const CACHE_NAME = "iolgregister-v1.1.3";
+const CACHE_NAME = "iolgregister-v1.1.4";
 const urlsToCache = [
   "https://slide-t.github.io/iolgregister/",
   "https://slide-t.github.io/iolgregister/index.html",
