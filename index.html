@@ -27,7 +27,7 @@
       padding: 10px 15px;
       margin-top: 10px;
       cursor: pointer;
-    }
+    }*/
   h2 {
     text-align: center;
     margin-bottom: 30px;
@@ -45,7 +45,7 @@
     #preview-container  { 
       display: none;
       margin: 20px;
-    }*/
+    }
   </style>
 </head>
 <body>
@@ -980,7 +980,15 @@ document.getElementById('biodata-form').addEventListener('submit', function (e) 
     doc.save("members.pdf");
   });
 </script>
-  
+  <script src="script.js"></script>
+
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./service-worker.js')
+      .then(reg => console.log('Service Worker registered:', reg.scope))
+      .catch(err => console.error('Service Worker registration failed:', err));
+  }
+  </script>
 </body>
 </html>
 
