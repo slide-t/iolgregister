@@ -732,7 +732,44 @@ margin-top: 20px;
   });
 
   // Handle Form Submission
+
   form.addEventListener("submit", function (e) {
+  e.preventDefault();
+
+  const vin = document.getElementById("vin").value.trim();
+
+  const members = JSON.parse(localStorage.getItem("members") || "[]");
+
+  // 🔒 Prevent duplicate VIN registration
+  const duplicate = members.find(member => member.vin === vin);
+  if (duplicate) {
+    alert("Duplicate registration! This VIN has already been used.");
+    return;
+  }
+
+  const member = {
+    fullName: document.getElementById("fullName").value,
+    phoneNumber: document.getElementById("phoneNumber").value,
+    gender: document.getElementById("gender").value,
+    state: document.getElementById("state").value,
+    lga: document.getElementById("lga").value,
+    ward: document.getElementById("ward").value,
+    unit: document.getElementById("pollingUnit").value,
+    age: document.getElementById("age").value,
+    vin: vin // ✅ Include VIN in stored data
+  };
+
+  members.push(member);
+  localStorage.setItem("members", JSON.stringify(members));
+
+  alert("Member Registered Successfully!");
+
+  form.reset();
+  partyIdGroup.classList.add("hidden");
+  pollingUnitGroup.classList.add("hidden");
+  bioData.classList.add("hidden");
+});
+ /* form.addEventListener("submit", function (e) {
     e.preventDefault();
 
     const member = {
@@ -757,6 +794,7 @@ margin-top: 20px;
     pollingUnitGroup.classList.add("hidden");
     bioData.classList.add("hidden");
   });
+  */
 
   // 📥 Generate PDF
   document.getElementById("download-pdf-btn").addEventListener("click", () => {
