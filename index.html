@@ -901,14 +901,7 @@ margin-top: 20px;
     doc.save("members.pdf");
   });
 </script>
-  <script>
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker
-      .register("/iolgregister/service-worker.js")
-      .then(() => console.log("✅ Service Worker registered"))
-      .catch((err) => console.error("SW registration failed:", err));
-  }
-  </script>
+  
 <!-- Welcome Modal -->
 <div id="welcomeModal" class="modal-overlay">
   <div class="modal-content">
@@ -936,6 +929,20 @@ margin-top: 20px;
       e.preventDefault();
     }
   };
+</script>
+  <script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("/iolgregister/service-worker.js", { scope: "/iolgregister/" })
+        .then((registration) => {
+          console.log("✅ Service Worker registered with scope:", registration.scope);
+        })
+        .catch((error) => {
+          console.error("❌ Service Worker registration failed:", error);
+        });
+    });
+  }
 </script>
 </body>
 </html>
