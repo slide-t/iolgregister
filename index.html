@@ -8,7 +8,22 @@
 
 <!-- Manifest -->
 <link rel="manifest" href="manifest.json">
+<script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore-compat.js"></script>
 
+<script>
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "iolgregister.firebaseapp.com",
+    projectId: "iolgregister",
+    storageBucket: "iolgregister.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+</script>
 <!-- Favicon / App Icons -->
 <link rel="icon" href="icons/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icons/icon-512.png">
@@ -307,19 +322,7 @@ margin-top: 20px;
 <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore-compat.js"></script>
 
-<script>
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "iolgregister.firebaseapp.com",
-    projectId: "iolgregister",
-    storageBucket: "iolgregister.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
 
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-</script>
   
   <script>
     const data = {
