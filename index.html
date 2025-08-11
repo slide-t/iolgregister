@@ -13,12 +13,13 @@
 
 <script>
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
+    apiKey: "AIzaSyCZ1H5Hiyzgiuj_r_IzOsK4M6Yxu6_N8fg",
     authDomain: "iolgregister.firebaseapp.com",
     projectId: "iolgregister",
     storageBucket: "iolgregister.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    messagingSenderId: "946784598325",
+    appId: "1:946784598325:web:e94029ad2322f4e0c3b47c"
+    
   };
 
   firebase.initializeApp(firebaseConfig);
@@ -593,7 +594,7 @@ margin-top: 20px;
       document.getElementById('party-id-group').classList.toggle('hidden', this.value !== 'yes');
     });
 
-    // Form submit
+    /*// Form submit
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       const member = {
@@ -679,7 +680,55 @@ margin-top: 20px;
   btn.innerText = "Close Preview";
 }
   </script>
+<!-- Firebase SDK scripts -->
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore-compat.js"></script>
 
+<script>
+  // Your Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyCZ1H5Hiyzgiuj_r_IzOsK4M6Yxu6_N8fg",
+    authDomain: "iolgregister.firebaseapp.com",
+    projectId: "iolgregister",
+    storageBucket: "iolgregister.firebasestorage.app",
+    messagingSenderId: "946784598325",
+    appId: "1:946784598325:web:e94029ad2322f4e0c3b47c"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  // Form submit
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const member = {
+      fullname: document.getElementById('fullname').value,
+      dob: document.getElementById('dob').value,
+      age: document.getElementById('age').value,
+      phone: document.getElementById('phone').value,
+      state: stateSelect.value,
+      lga: lgaSelect.value,
+      ward: wardSelect.value,
+      unit: unitSelect.value,
+      vin: document.getElementById('vin').value,
+      partyId: document.getElementById('partyId').value,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    try {
+      await db.collection("members").add(member);
+      alert("Member registered!");
+      form.reset();
+    } catch (error) {
+      console.error("Error adding member: ", error);
+      alert("Failed to register member. Please try again.");
+    }
+  });
+</script>
+
+  
   <!--
   
   <button id="download-pdf-btn" style="background-color:#28a745; color:white; padding:10px 20px; border:none; border-radius:5px; cursor:pointer; margin-top: 20px;">
