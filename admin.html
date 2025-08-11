@@ -1,307 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #f4f4f4;
-        margin: 0;
-        padding: 0;
-    }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Live Database</title>
 
-    /* Login Form */
-    #login-section {
-        display: flex;
-        height: 100vh;
-        justify-content: center;
-        align-items: center;
-        background: #001219;
-    }
-    .login-box {
-        background: white;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        width: 300px;
-        text-align: center;
-    }
-    .login-box h2 {
-        margin-bottom: 20px;
-        color: #001219;
-    }
-    .login-box input {
-        width: 100%;
-        padding: 10px;
-        margin: 8px 0;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
-    .login-box button {
-        width: 100%;
-        padding: 10px;
-        background: #0077b6;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-    }
-    .login-box button:hover {
-        background: #023e8a;
-    }
+  <!-- Bootstrap for Styling -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 
-    /* Dashboard */
-    #dashboard {
-        display: none;
-        padding: 20px;
-    }
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
 
-    .action-buttons {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-bottom: 20px;
+  <style>
+    body { background: #f8f9fa; }
+    h2 { margin: 20px 0; }
+    .filter-section {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
     }
-    .action-buttons button {
-        width: 200px;
-        padding: 12px;
-        font-size: 16px;
-        margin: 8px 0;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        color: white;
+    .dataTables_wrapper .dt-buttons {
+      margin-bottom: 10px;
     }
-    .btn-pdf {
-        background: #e63946;
-    }
-    .btn-pdf:hover {
-        background: #d62828;
-    }
-    .btn-excel {
-        background: #2a9d8f;
-    }
-    .btn-excel:hover {
-        background: #21867a;
-    }
-
-    /* Table */
-    table {
-        border-collapse: collapse;
-        width: 100%;
-        background: white;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    table th, table td {
-        padding: 10px;
-        border: 1px solid #ddd;
-        text-align: left;
-    }
-    table th {
-        background: #001219;
-        color: white;
-    }
-</style>
+  </style>
 </head>
 <body>
 
-<!-- Login Section -->
-<div id="login-section">
-    <div class="login-box">
-        <h2>Admin Login</h2>
-        <input type="text" id="username" placeholder="Username">
-        <input type="password" id="password" placeholder="Password">
-        <button onclick="login()">Login</button>
-    </div>
-</div>
+<div class="container mt-4">
+  <h2 class="text-center">Admin Dashboard - Live Data</h2>
 
-<!-- Dashboard -->
-<div id="dashboard">
-    <h1>Admin Dashboard</h1>
+  <!-- Filters -->
+  <div class="filter-section">
+    <select id="filterWard" class="form-select" style="width:200px;">
+      <option value="">Filter by Ward</option>
+    </select>
+    <select id="filterPolling" class="form-select" style="width:200px;">
+      <option value="">Filter by Polling Unit</option>
+    </select>
+    <button id="resetFilters" class="btn btn-secondary">Reset Filters</button>
+  </div>
 
-    <!-- Action Buttons -->
-    <div class="action-buttons">
-        <button class="btn-pdf" onclick="printPDF()">📄 Print PDF</button>
-        <button class="btn-excel" onclick="exportExcel()">📊 Export Excel</button>
-    </div>
-
-    <!-- Data Table -->
-    <table id="dataTable">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Ward</th>
-                <th>Polling Unit</th>
-            </tr>
-        </thead>
-        <tbody id="table-body">
-            <!-- Data will load here -->
-        </tbody>
+  <!-- Data Table -->
+  <div class="table-responsive">
+    <table id="dataTable" class="display nowrap table table-bordered" style="width:100%">
+      <thead>
+        <tr>
+          <th>Full Name</th>
+          <th>Phone Number</th>
+          <th>Gender</th>
+          <th>State</th>
+          <th>LGA</th>
+          <th>Ward</th>
+          <th>Polling Unit</th>
+        <th>VIN</th>
+            <th>Member ID</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Data from SheetDB will load here -->
+      </tbody>
     </table>
+  </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script>
-    // Simple login
-    function login() {
-        const user = document.getElementById("username").value;
-        const pass = document.getElementById("password").value;
-        if (user === "admin" && pass === "1234") {
-            document.getElementById("login-section").style.display = "none";
-            document.getElementById("dashboard").style.display = "block";
-            loadData();
-        } else {
-            alert("Invalid credentials!");
-        }
-    }
+<!-- JS Libraries -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
 
-    // Load data from JSON (replace URL with your SheetDB or API endpoint)
+<script>
+$(document).ready(function () {
+    const sheetDBUrl = "YOUR_SHEETDB_API_URL"; // <-- Replace with your SheetDB API URL
+
+    let table = $('#dataTable').DataTable({
+        dom: 'Bfrtip',
+        buttons: ['excelHtml5', 'pdfHtml5', 'print'],
+        responsive: true
+    });
+
     function loadData() {
-        fetch("https://sheetdb.io/api/v1/YOUR_SHEETDB_ID")
-        .then(res => res.json())
-        .then(data => {
-            let rows = "";
-            data.forEach(item => {
-                rows += `<tr>
-                    <td>${item.fullName}</td>
-                    <td>${item.ward}</td>
-                    <td>${item.pollingUnit}</td>
-                </tr>`;
+        $.getJSON(sheetDBUrl, function (data) {
+            table.clear();
+
+            let wards = new Set();
+            let pollingUnits = new Set();
+
+            data.forEach(row => {
+                table.row.add([
+                    row.fullName || '',
+                    row.phoneNumber || '',
+                    row.gender || '',
+                    row.state || '',
+                    row.lga || '',
+                    row.ward || '',
+                    row.pollingUnit || '',
+                    row.vin || '',
+                    row.memberId || ''
+                ]);
+
+                if (row.ward) wards.add(row.ward);
+                if (row.pollingUnit) pollingUnits.add(row.pollingUnit);
             });
-            document.getElementById("table-body").innerHTML = rows;
+
+            // Populate filters
+            $('#filterWard').empty().append('<option value="">Filter by Ward</option>');
+            $('#filterPolling').empty().append('<option value="">Filter by Polling Unit</option>');
+
+            wards.forEach(w => $('#filterWard').append(`<option value="${w}">${w}</option>`));
+            pollingUnits.forEach(p => $('#filterPolling').append(`<option value="${p}">${p}</option>`));
+
+            table.draw();
         });
     }
 
-    // Print PDF
-    function printPDF() {
-        const printContent = document.getElementById("dataTable").outerHTML;
-        const win = window.open("", "", "width=800,height=600");
-        win.document.write("<html><head><title>Print PDF</title></head><body>");
-        win.document.write(printContent);
-        win.document.write("</body></html>");
-        win.document.close();
-        win.print();
-    }
+    // Load data initially
+    loadData();
 
-    // Export Excel
-    function exportExcel() {
-        let table = document.getElementById("dataTable");
-        let wb = XLSX.utils.table_to_book(table, {sheet: "Sheet1"});
-        XLSX.writeFile(wb, "data.xlsx");
-    }
-</script>
+    // Auto refresh every 10 seconds
+    setInterval(loadData, 10000);
 
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-
-
-
-<!--<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Login</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <div class="login-container">
-    <h2>Admin Login</h2>
-    <form id="adminLoginForm">
-      <input type="text" id="adminUsername" placeholder="Username" required />
-      <input type="password" id="adminPassword" placeholder="Password" required />
-      <button type="submit">Login</button>
-    </form>
-    <p id="loginStatus" class="error"></p>
-  </div>
-  <!-- change-password.html --
-<h2>Change Your Password</h2>
-<form id="changePasswordForm">
-  <label>New Password:</label>
-  <input type="password" id="newPassword" required><br><br>
-  <button type="submit">Update Password</button>
-  <p id="changeStatus"></p>
-</form>
-  -->
-<!--<script>
-  const form = document.getElementById('changePasswordForm');
-  const status = document.getElementById('changeStatus');
-
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    const newPassword = document.getElementById('newPassword').value;
-
-    if (newPassword.length < 6) {
-      status.textContent = "Password must be at least 6 characters.";
-      return;
-    }
-
-    localStorage.setItem('adminPassword', newPassword);
-    status.textContent = "Password updated! Redirecting...";
-    setTimeout(() => {
-      window.location.href = "registerpreview.html";
-    }, 1500);
-  });
-</script>
-  <script>
-    const loginForm = document.getElementById('adminLoginForm');
-    const loginStatus = document.getElementById('loginStatus');
-
-    loginForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-      const username = document.getElementById('adminUsername').value;
-      const password = document.getElementById('adminPassword').value;
-
-      if (username === 'admin' && password === 'admin123') {
-        sessionStorage.setItem("isAdminLoggedIn", "true");
-        window.location.href = "registerpreview.html";
-      } else {
-        loginStatus.textContent = "Invalid credentials!";
-      }
+    // Filter functionality
+    $('#filterWard').on('change', function () {
+        table.column(5).search(this.value).draw();
     });
-  </script>
-  
-  <script>
-  const loginForm = document.getElementById('adminLoginForm');
-  const loginStatus = document.getElementById('loginStatus');
 
-  // Set default password if none is set yet
-  if (!localStorage.getItem('adminPassword')) {
-    localStorage.setItem('adminPassword', 'admin123');
-  }
+    $('#filterPolling').on('change', function () {
+        table.column(6).search(this.value).draw();
+    });
 
-  loginForm.addEventListener('submit', function (e) {
-    e.preventDefault();
-    const username = document.getElementById('adminUsername').value;
-    const password = document.getElementById('adminPassword').value;
-
-    const storedPassword = localStorage.getItem('adminPassword');
-
-    if (username === 'admin' && password === storedPassword) {
-      sessionStorage.setItem("isAdminLoggedIn", "true");
-
-      // Redirect to change-password.html if default password is still in use
-      if (password === 'admin123') {
-        window.location.href = "change-password.html";
-      } else {
-        window.location.href = "dashboard.html";
-      }
-    } else {
-      loginStatus.textContent = "Invalid credentials!";
-    }
-  });
+    $('#resetFilters').on('click', function () {
+        $('#filterWard').val('');
+        $('#filterPolling').val('');
+        table.search('').columns().search('').draw();
+    });
+});
 </script>
 </body>
 </html>
