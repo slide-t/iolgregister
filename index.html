@@ -931,18 +931,15 @@ margin-top: 20px;
   };
 </script>
   <script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker
-        .register("/iolgregister/service-worker.js", { scope: "/iolgregister/" })
-        .then((registration) => {
-          console.log("✅ Service Worker registered with scope:", registration.scope);
-        })
-        .catch((error) => {
-          console.error("❌ Service Worker registration failed:", error);
-        });
-    });
-  }
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/sw.js").then(reg => {
+    console.log("Service Worker registered:", reg);
+  }).catch(err => {
+    console.error("Service Worker registration failed:", err);
+  });
+}
+
+    
 </script>
 </body>
 </html>
