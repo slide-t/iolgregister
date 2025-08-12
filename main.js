@@ -1,6 +1,6 @@
 
   
-
+/*
   const data = {
     ogun: {
       "Ijebu Ode": {
@@ -17,8 +17,26 @@
         // Add Ward-3 to Ward-11 as needed...
       }
     }
-  };
-
+  };*/
+const data = {
+  ogun: {
+    "Ijebu Ode": {
+      "Ward-1": [
+        "001-BESIDE CO-OP BUILDING EXISTING PU",
+        "002-EMMANUEL SCHOOL I ITALUPE EXISTING PU",
+        "003-MOSLEM SCHOOL, ISOKU EXISTING PU",
+        "004-FRONT OF TALABI’S HOUSE OLISA STREET I EXISTING PU",
+        "005-IMORU ROAD JUNCTION EXISTING PU",
+        "006-OKE-OLA ILORIN EXISTING PU",
+        "007-EMMANUEL SCHOOL II EXISTING PU",
+        "008-FRONT OF TALABI’S HOUSE OLISA STREET II EXISTING PU",
+        "009-ADJACENT A. B SUNMOLA HOUSE, IJAGUN ROAD NEW PU",
+        "010-BESIDE 3A’S HOTEL, IMORU ROAD NEW PU",
+        "011-MOSLEM SCHOOL II ONDO ROAD NEW PU"
+      ]
+    }
+  }
+};
   // ====== DOM elements ======
   const stateEl = document.getElementById("state");
   const lgaEl = document.getElementById("lga");
