@@ -18,10 +18,18 @@
     .small { font-size:0.9rem; color:#555; }  
     .two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; }  
     @media (max-width:600px){ .two-col{ grid-template-columns:1fr; } }  
-  </style>    
   
-  <!-- Firebase v8 -->    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>    <!-- html2canvas & jsPDF -->    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>  </head>  
-<body>    <div class="container">  
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>   
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>  
+</head>  
+<body>   
+  <div class="container">  
     <h2>Group Membership Registration</h2>  <!-- State Selection -->  
 <div class="form-group">  
   <label for="state">Select State:</label>  
@@ -124,6 +132,13 @@
 <div class="form-group">  
   <button type="button" id="preview-btn" class="secondary">Preview Registration</button>  
 </div>
+
+
+<!-- Spinner -->
+<div id="preview-spinner" style="display:none; text-align:center; margin-top:10px;">
+  <div class="spinner" style="border: 4px solid #ccc; border-top: 4px solid grey; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin:auto;"></div>
+</div>
+
 
   <!-- Admin only field -->  
   <div class="form-group hidden" id="timestamp-group">  
@@ -796,18 +811,6 @@ document.getElementById("darkModeSwitch").addEventListener("change", function ()
 </script>
   
 
-
-<!-- Spinner -->
-<div id="preview-spinner" style="display:none; text-align:center; margin-top:10px;">
-  <div class="spinner" style="border: 4px solid #ccc; border-top: 4px solid grey; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin:auto;"></div>
-</div>
-
-<style>
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-</style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
