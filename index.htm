@@ -120,9 +120,10 @@
     <button type="submit" id="register-btn">Register Member</button>  
   </div>  
 
-  <div class="form-group">  
-    <button type="button" id="preview-btn" class="secondary">Preview Registration</button>  
-  </div>  
+  <!-- Preview Button -->
+<div class="form-group">  
+  <button type="button" id="preview-btn" class="secondary">Preview Registration</button>  
+</div>
 
   <!-- Admin only field -->  
   <div class="form-group hidden" id="timestamp-group">  
@@ -793,7 +794,64 @@ document.getElementById("darkModeSwitch").addEventListener("change", function ()
   document.body.classList.toggle("dark-mode", this.checked);
 });
 </script>
+  
 
+
+<!-- Spinner -->
+<div id="preview-spinner" style="display:none; text-align:center; margin-top:10px;">
+  <div class="spinner" style="border: 4px solid #ccc; border-top: 4px solid grey; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin:auto;"></div>
+</div>
+
+<style>
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+document.getElementById("preview-btn").addEventListener("click", () => {
+  const spinner = document.getElementById("preview-spinner");
+  spinner.style.display = "block";
+
+  setTimeout(() => {
+    spinner.style.display = "none";
+
+    // Collect form data
+    const formData = {
+      Fullname: document.getElementById("fullname").value.trim(),
+      Phone: document.getElementById("phone").value.trim(),
+      Address: document.getElementById("address").value.trim(),
+      Ward: document.getElementById("ward").value.trim(),
+      "Polling Unit": document.getElementById("pollingUnit").value.trim(),
+      VIN: document.getElementById("vin").value.trim(),
+      Gender: document.getElementById("gender").value
+    };
+
+    // Create PDF in table format
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFontSize(16);
+    doc.text("Registration Preview", 14, 20);
+
+    let startY = 30;
+    Object.entries(formData).forEach(([key, value]) => {
+      doc.rect(14, startY, 50, 10);
+      doc.text(key, 16, startY + 7);
+
+      doc.rect(64, startY, 130, 10);
+      doc.text(value || "-", 66, startY + 7);
+
+      startY += 10;
+    });
+
+    // Open PDF in browser
+    window.open(doc.output('bloburl'), '_blank');
+  }, 800); // Simulate loading
+});
+</script>
   
   
   <!--
