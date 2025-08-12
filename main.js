@@ -1,23 +1,4 @@
 
-  
-/*
-  const data = {
-    ogun: {
-      "Ijebu Ode": {
-        "Ward-1": [
-          "001-Beside Co-Operative Building (Existing)",
-          "002-Emmanuel School I, Italupe (Existing)",
-          "003-Moslem School, Isoku (Existing)"
-        ],
-        "Ward-2": [
-          "001-Baptist Day School, Ereko (Existing)",
-          "002-Front of Our Lady’s School (Existing)",
-          "003-Front of Alhaji Kukoyi’s House (Existing)"
-        ]
-        // Add Ward-3 to Ward-11 as needed...
-      }
-    }
-  };*/
 const data = {
   ogun: {
     "Ijebu Ode": {
@@ -33,7 +14,22 @@ const data = {
         "009-ADJACENT A. B SUNMOLA HOUSE, IJAGUN ROAD NEW PU",
         "010-BESIDE 3A’S HOTEL, IMORU ROAD NEW PU",
         "011-MOSLEM SCHOOL II ONDO ROAD NEW PU"
-      ]
+      ],
+      {
+  "Ward-2": [
+    "001 BAPTIST DAY SCHOOL EREKO EXISTING PU",
+    "002 FRONT OF OUR LADY’S SCHOOL EXISTING PU",
+    "003 FRONT OF ALHAJI KUKOYI’S HOUSE EXISTING PU",
+    "004 OPPOSITE ITAJANA MOSQUE EXISTING PU",
+    "005 STATE HOSPITAL EXISTING PU",
+    "006 DENTAL CENTRE EXISTING PU",
+    "007 BY ODO ESA PREMIER MOSQUE NEAR IDIROKO, OLISA NEW PU",
+    "008 SAKA ASHIRU JUNCTION VIA MAYOMAYO NEW PU",
+    "009 OPEN SPACE BY OLORUNGBEBE MOSQUE NEW PU",
+    "010 JIMILEYIN JUNCTION, ADJACENT IREPODUN MOSQUE NEW PU",
+    "011 OPEN SPACE AT OGUNTUGA FOUR JUNCTION NEW PU"
+  ],
+
     }
   }
 };
