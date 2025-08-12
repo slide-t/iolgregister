@@ -1,5 +1,6 @@
 
-  // ====== LOCATION DATA (placeholder wards) ======
+  
+
   const data = {
     ogun: {
       "Ijebu Ode": {
