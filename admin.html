@@ -6,6 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Group Member Registration - Admin Dashboard</title>
   <link rel="stylesheet" href="style.css"/>
+  
+
+  <!--
   <style>
     body { font-family: Arial, sans-serif; background:#f7f9fc; padding:20px; }
     .container { max-width:1100px; margin:auto; background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
@@ -42,6 +45,7 @@
       .assign-panel { grid-template-columns:1fr; }
     }
   </style>
+  -->
   <!-- jsPDF + autoTable -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
@@ -342,6 +346,8 @@ fetchData();
   </div>
 </div>
 
+
+    <!--
 <script>
   function checkAdminKey(){
     const keyInput = document.getElementById("adminKey");
@@ -360,7 +366,7 @@ fetchData();
     document.getElementById("adminKey").focus();
   });
 </script>
-  
+  -->
   <script src="admin.js"></script>
     <script src="admin1.js"></script>
     <script sec="admin2.js"></script>
@@ -376,6 +382,19 @@ fetchData();
         });
     });
   }
+</script>
+    <!-- Dark Mode Switch -->
+<div class="dark-mode-toggle">
+  <label class="switch">
+    <input type="checkbox" id="darkModeSwitch">
+    <span class="slider"></span>
+  </label>
+</div>
+
+<script>
+document.getElementById("darkModeSwitch").addEventListener("change", function () {
+  document.body.classList.toggle("dark-mode", this.checked);
+});
 </script>
 </body>
 </html>
