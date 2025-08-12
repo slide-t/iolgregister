@@ -3,9 +3,11 @@
   "short_name": "IOLG",
   "start_url": "https://slide-t.github.io/iolgregister/",
   "display": "standalone",
+  "display": "standalone",
+"orientation": "portrait"
   "background_color": "#ffffff",
   "theme_color": "#001219",
-  "orientation": "landscape",
+  
   "icons": [
     {
       "src": "icon-192.png",
