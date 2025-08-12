@@ -341,7 +341,7 @@ fetchData();
     <button onclick="checkAdminKey()">Enter</button>
   </div>
 </div>
-
+<!--
 <script>
   function checkAdminKey(){
     const keyInput = document.getElementById("adminKey");
@@ -360,9 +360,22 @@ fetchData();
     document.getElementById("adminKey").focus();
   });
 </script>
-    
+    -->
   <script src="admin.js"></script>
     <script src="admin1.js"></script>
     <script sec="admin2.js"></script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(function(registration) {
+          console.log('ServiceWorker registered with scope:', registration.scope);
+        })
+        .catch(function(error) {
+          console.log('ServiceWorker registration failed:', error);
+        });
+    });
+  }
+</script>
 </body>
 </html>
