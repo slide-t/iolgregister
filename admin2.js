@@ -3,7 +3,7 @@
   function checkAdminKey(){
     const keyInput = document.getElementById("adminKey");
     const errorMsg = document.getElementById("errorMsg");
-    if(keyInput.value.trim() === "Jal2027"){
+    if(keyInput.value.trim() === "justJimi2027"){
       document.getElementById("adminOverlay").style.display = "none";
     } else {
       errorMsg.style.display = "block";
