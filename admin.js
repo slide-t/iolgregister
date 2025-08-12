@@ -1,4 +1,4 @@
-<script>
+
   const CODES_SHEET_URL = "https://sheetdb.io/api/v1/YOUR_CODES_SHEET_ID"; // replace with your codes sheet ID
 
   document.getElementById("assignGeneralBtn").addEventListener("click", () => {
@@ -35,4 +35,4 @@
         }
       });
   });
-</script>
+
