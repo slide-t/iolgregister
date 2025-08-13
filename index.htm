@@ -1138,29 +1138,6 @@ document.getElementById('register-btn').addEventListener('click', function (e) {
   showSpinner('register-btn', 'register-spinner');
 });
 
-// Preview button click (Download PDF)
-document.getElementById('preview-btn').addEventListener('click', function () {
-  showSpinner('preview-btn', 'preview-spinner');
-
-  try {
-    // Replace this URL with your actual generated PDF file path
-    const pdfUrl = '/path/to/preview.pdf';
-
-    // Create a hidden link for download
-    const link = document.createElement('a');
-    link.href = pdfUrl;
-    link.download = 'registration-preview.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    // Stop spinner after triggering download
-    hideSpinner('preview-btn', 'preview-spinner');
-  } catch (error) {
-    console.error('Download failed:', error);
-    hideSpinner('preview-btn', 'preview-spinner'); // Ensure spinner stops
-  }
-});
 
 // Restore buttons if validation error modal closes
 document.getElementById('errorModalOkBtn')?.addEventListener('click', function () {
@@ -1173,11 +1150,97 @@ document.getElementById('errorModalOkBtn')?.addEventListener('click', function (
   hideSpinner('register-btn', 'register-spinner');
   hideSpinner('preview-btn', 'preview-spinner');
 });
-
-
     
 </script>
+<script>
+(function () {
+  // Helpers to read current form values safely
+  const get = id => (document.getElementById(id)?.value || '').trim();
+  const getSelText = id => {
+    const el = document.getElementById(id);
+    if (!el) return '';
+    const opt = el.options?.[el.selectedIndex];
+    return (opt?.text || el.value || '').trim();
+  };
 
+  // Preview -> generate + download PDF
+  document.getElementById('preview-btn')?.addEventListener('click', function () {
+    showSpinner('preview-btn', 'preview-spinner');
+
+    try {
+      if (!window.jspdf || !window.jspdf.jsPDF) {
+        throw new Error('jsPDF is not loaded on this page.');
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+
+      // Title
+      doc.setFontSize(15);
+      doc.text('Registration Preview', 14, 16);
+      doc.setFontSize(10);
+
+      // Collect current form values
+      const rows = [
+        ['Full Name', get('fullname') || '-'],
+        ['Phone', get('phone') || '-'],
+        ['VIN', get('vin') || '-'],
+        ['Member ID', get('memberId') || '-'],
+        ['Address', get('address') || '-'],
+        ['Date of Birth', get('dob') || '-'],
+        ['Age', get('age') || '-'],
+        ['State', getSelText('state') || '-'],
+        ['LGA', getSelText('lga') || '-'],
+        ['Ward', getSelText('ward') || '-'],
+        ['Polling Unit', getSelText('unit') || '-'],
+        ['Registered Voter', get('isVoter') || '-'],
+        ['Party Member', get('isPartyMember') || '-'],
+        ['Party ID', get('partyId') || '-'],
+      ];
+
+      // Simple table layout
+      const startX = 14;
+      const startY = 22;
+      const colW1 = 50;   // label column
+      const colW2 = 140;  // value column
+      const lineH = 6;
+      let y = startY;
+
+      rows.forEach(([label, value]) => {
+        const wrapped = doc.splitTextToSize(value, colW2 - 4);
+        const cellH = Math.max(lineH, wrapped.length * lineH);
+
+        // draw cells
+        doc.rect(startX, y, colW1, cellH);
+        doc.rect(startX + colW1, y, colW2, cellH);
+
+        // text
+        doc.text(label, startX + 2, y + 4);
+        wrapped.forEach((line, i) => {
+          doc.text(line, startX + colW1 + 2, y + 4 + i * lineH);
+        });
+
+        y += cellH;
+
+        // new page if needed
+        if (y > 280) {
+          doc.addPage();
+          y = 14;
+        }
+      });
+
+      // Trigger download
+      doc.save('registration-preview.pdf');
+    } catch (err) {
+      console.error(err);
+      alert('Could not generate the PDF preview. Please try again.');
+    } finally {
+      // Always restore the button/spinner state
+      hideSpinner('preview-btn', 'preview-spinner');
+    }
+  });
+})();
+</script>
 
 
 </body>  
