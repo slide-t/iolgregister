@@ -744,25 +744,78 @@ document.getElementById("darkModeSwitch").addEventListener("change", function ()
 <!-- preview button css-->
 <style>
   .spinner {
-  border: 4px solid #ccc; /* Light grey */
-  border-top: 4px solid #555; /* Darker grey */
-  border-radius: 50%;
   width: 30px;
   height: 30px;
+  border: 4px solid #ccc;
+  border-top: 4px solid gray;
+  border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin: 10px auto;
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.hidden {
+  display: none;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  to { transform: rotate(360deg); }
 }
-
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 document.getElementById("preview-btn").addEventListener("click", function () {
+  const spinner = document.getElementById("preview-spinner");
+  
+  // Show spinner
+  spinner.classList.remove("hidden");
+
+  // Gather form data
+  const formData = {
+    fullName: document.getElementById("fullName")?.value || "",
+    phoneNumber: document.getElementById("phoneNumber")?.value || "",
+    gender: document.getElementById("gender")?.value || "",
+    state: document.getElementById("state")?.value || "",
+    lga: document.getElementById("lga")?.value || "",
+    ward: document.getElementById("ward")?.value || "",
+    pollingUnit: document.getElementById("pollingUnit")?.value || ""
+  };
+
+  // Wait 2s before showing preview
+  setTimeout(() => {
+    spinner.classList.add("hidden");
+
+    // Generate table HTML
+    const tableHTML = `
+      <h2 style="text-align:center;">Registration Preview</h2>
+      <table border="1" cellspacing="0" cellpadding="8" style="width:100%; border-collapse:collapse;">
+        <tr><th>Full Name</th><td>${formData.fullName}</td></tr>
+        <tr><th>Phone Number</th><td>${formData.phoneNumber}</td></tr>
+        <tr><th>Gender</th><td>${formData.gender}</td></tr>
+        <tr><th>State</th><td>${formData.state}</td></tr>
+        <tr><th>LGA</th><td>${formData.lga}</td></tr>
+        <tr><th>Ward</th><td>${formData.ward}</td></tr>
+        <tr><th>Polling Unit</th><td>${formData.pollingUnit}</td></tr>
+      </table>
+    `;
+
+    // Open new tab and print as PDF
+    const newWindow = window.open("", "_blank");
+    newWindow.document.write(`
+      <html>
+      <head><title>Registration Preview</title></head>
+      <body>${tableHTML}</body>
+      </html>
+    `);
+    newWindow.document.close();
+    newWindow.print();
+  }, 2000);
+});
+  
+  
+  
+  /*document.getElementById("preview-btn").addEventListener("click", function () {
     let spinner = document.getElementById("preview-spinner");
     spinner.style.display = "block";
 
