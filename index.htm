@@ -25,7 +25,7 @@
   100% { transform: rotate(360deg); }
 }
 </style>-->
-  
+  <!--
   <style>
   /* Common hidden utility */
 .hidden {
@@ -82,8 +82,49 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+  </style>-->
+  <!--New css -->
+  <style>
+/* Common hidden utility */
+.hidden {
+  display: none;
+}
+
+/* Register spinner - 4 color circular */
+.spinner {
+  border: 4px solid transparent;
+  border-top: 4px solid red;
+  border-right: 4px solid green;
+  border-bottom: 4px solid blue;
+  border-left: 4px solid yellow;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  animation: spin 1s linear infinite;
+  margin-left: 6px;
+}
+
+/* Preview spinner - grey circular */
+.spinner-preview {
+  border: 4px solid transparent;
+  border-top: 4px solid grey;
+  border-right: 4px solid lightgrey;
+  border-bottom: 4px solid darkgrey;
+  border-left: 4px solid silver;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  animation: spin 1s linear infinite;
+  margin-left: 6px;
+}
+
+/* Spin animation (perfect circle roll) */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+    
   </style>
-  
   
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>   
