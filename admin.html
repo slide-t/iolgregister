@@ -91,251 +91,86 @@
 <div class="assign-panel">
   <input id="assignWard" placeholder="Assign general code to Ward" />
   <input id="assignGeneralCode" placeholder="General secure code for ward" />
-  <button id="assignGeneralBtn">Assign to Ward</button>
+  <button id="assignGeneralBtn">
+    <span id="assignBtnText">Assign to Ward</span>
+    <span id="assignBtnSpinner" class="assign-spinner" style="display:none;"></span>
+  </button>
 </div>
-<!--
+
+<style>
+  /* Unique spinner for assign button */
+  .assign-spinner {
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid white;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    animation: assign-spin 0.8s linear infinite;
+    display: inline-block;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  @keyframes assign-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+
 <script>
-  const CODES_SHEET_URL = "https://sheetdb.io/api/v1/YOUR_CODES_SHEET_ID"; // replace with your codes sheet ID
+  const CODES_SHEET_URL = "https://sheetdb.io/api/v1/ji8u767etbjge"; // your link
 
   document.getElementById("assignGeneralBtn").addEventListener("click", () => {
     const ward = document.getElementById("assignWard").value.trim();
     const code = document.getElementById("assignGeneralCode").value.trim();
+    const btnText = document.getElementById("assignBtnText");
+    const btnSpinner = document.getElementById("assignBtnSpinner");
 
     if (!ward || !code) {
       alert("Please enter both Ward and Code.");
       return;
     }
 
-    // First check if this ward already exists in codes sheet
+    // Show spinner
+    btnText.style.display = "none";
+    btnSpinner.style.display = "inline-block";
+
     fetch(`${CODES_SHEET_URL}/search?ward=${encodeURIComponent(ward)}`)
       .then(res => res.json())
       .then(data => {
         if (data.length > 0) {
           // Ward exists → Update
-          fetch(`${CODES_SHEET_URL}/ward/${encodeURIComponent(ward)}`, {
+          return fetch(`${CODES_SHEET_URL}/ward/${encodeURIComponent(ward)}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ code: code })
-          })
-            .then(() => alert(`Code updated for ${ward}`))
-            .catch(err => console.error(err));
+          }).then(() => alert(`Code updated for ${ward}`));
         } else {
           // Ward doesn't exist → Create new
-          fetch(CODES_SHEET_URL, {
+          return fetch(CODES_SHEET_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify([{ ward: ward, code: code }])
-          })
-            .then(() => alert(`Code assigned to ${ward}`))
-            .catch(err => console.error(err));
+          }).then(() => alert(`Code assigned to ${ward}`));
         }
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Error assigning code. Please try again.");
+      })
+      .finally(() => {
+        // Hide spinner, show text
+        btnText.style.display = "inline";
+        btnSpinner.style.display = "none";
       });
   });
 </script>
-<script>
 
-
-// --- Configuration ---
-const SHEETDB_URL = 'https://sheetdb.io/api/v1/ji8u767etbjge';
-
-// Local mapping of secure codes
-function loadCodes(){
-  try { return JSON.parse(localStorage.getItem('secureCodes') || '{}'); } catch(e){ return {}; }
-}
-function saveCodes(obj){ localStorage.setItem('secureCodes', JSON.stringify(obj)); }
-
-let members = [];
-const wardSel = document.getElementById('filterWard');
-const unitSel = document.getElementById('filterUnit');
-const searchEl = document.getElementById('searchName');
-const tbody = document.querySelector('#membersTable tbody');
-
-async function fetchData(){
-  try {
-    const res = await fetch(SHEETDB_URL);
-    if(!res.ok) throw new Error('Failed to fetch');
-    const data = await res.json();
-    members = data.map(item => ({
-      FullName: item.FullName || item.fullname || '',
-      phoneNumber: item.phoneNumber || item.phone || '',
-      address: item.address || '',
-      ward: item.ward || '',
-      pollingUnit: item.pollingUnit || item.unit || '',
-      vin: item.vin || ''
-    }));
-    populateFilters();
-    renderTable();
-  } catch(err){ console.error(err); alert('Could not load registrations.'); }
-}
-
-function populateFilters(){
-  const wards = Array.from(new Set(members.map(m => m.ward).filter(Boolean))).sort();
-  const units = Array.from(new Set(members.map(m => m.pollingUnit).filter(Boolean))).sort();
-  wardSel.innerHTML = '<option value="">-- Filter by Ward --</option>' + wards.map(w => `<option value="${escapeHtml(w)}">${escapeHtml(w)}</option>`).join('');
-  unitSel.innerHTML = '<option value="">-- Filter by Polling Unit --</option>' + units.map(u => `<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`).join('');
-}
-
-function escapeHtml(str){ return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-function renderTable(){
-  const codes = loadCodes();
-  const wardFilter = wardSel.value;
-  const unitFilter = unitSel.value;
-  const q = searchEl.value.trim().toLowerCase();
-  const filtered = members.filter(m => {
-    if(wardFilter && m.ward !== wardFilter) return false;
-    if(unitFilter && m.pollingUnit !== unitFilter) return false;
-    if(q && !m.FullName.toLowerCase().includes(q) && !m.phoneNumber.includes(q)) return false;
-    return true;
-  });
-  tbody.innerHTML = filtered.map(m => {
-    const keyGen = `${m.ward}::general`;
-    const keyInd = `${m.ward}::${m.FullName}`;
-    const code = codes[keyInd] || codes[keyGen] || '';
-    return `<tr>
-      <td>${escapeHtml(m.FullName)}</td>
-      <td>${escapeHtml(m.phoneNumber)}</td>
-      <td>${escapeHtml(m.address)}</td>
-      <td>${escapeHtml(m.ward)}</td>
-      <td>${escapeHtml(m.pollingUnit)}</td>
-      <td>${escapeHtml(m.vin)}</td>
-      <td>${escapeHtml(code)}</td>
-      <td><button class="assignBtn" data-name="${encodeURIComponent(m.FullName)}" data-ward="${encodeURIComponent(m.ward)}">Assign Code</button></td>
-    </tr>`;
-  }).join('');
-
-  document.querySelectorAll('.assignBtn').forEach(btn => btn.addEventListener('click', onAssignClick));
-}
-
-function onAssignClick(e){
-  const btn = e.currentTarget;
-  const name = decodeURIComponent(btn.dataset.name);
-  const ward = decodeURIComponent(btn.dataset.ward);
-  const codes = loadCodes();
-  const current = codes[`${ward}::${name}`] || codes[`${ward}::general`] || '';
-  const input = prompt(`Set secure code for ${name} (Ward: ${ward}). Leave empty to clear. Current: ${current}`, current);
-  if(input === null) return;
-  const key = `${ward}::${name}`;
-  if(input.trim() === ''){ delete codes[key]; }
-  else codes[key] = input.trim();
-  saveCodes(codes);
-  renderTable();
-}
-
-document.getElementById('assignGeneralBtn').addEventListener('click', () => {
-  const ward = wardSel.value;
-  const code = document.getElementById('assignGeneralCode').value.trim();
-  if(!ward){ alert('Select a ward in the filter above first.'); return; }
-  if(!code){ alert('Enter a code to assign.'); return; }
-  const codes = loadCodes();
-  codes[`${ward}::general`] = code;
-  saveCodes(codes);
-  document.getElementById('assignGeneralCode').value = '';
-  renderTable();
-  alert('General code assigned for ward: ' + ward);
-});
-
-wardSel.addEventListener('change', renderTable);
-unitSel.addEventListener('change', renderTable);
-searchEl.addEventListener('input', debounce(renderTable, 250));
-document.getElementById('refreshBtn').addEventListener('click', fetchData);
-
-document.getElementById('previewPdfBtn').addEventListener('click', () => {
-  const codes = loadCodes();
-  const wardFilter = wardSel.value;
-  const unitFilter = unitSel.value;
-  const q = searchEl.value.trim().toLowerCase();
-  const rows = members.filter(m => {
-    if(wardFilter && m.ward !== wardFilter) return false;
-    if(unitFilter && m.pollingUnit !== unitFilter) return false;
-    if(q && !m.FullName.toLowerCase().includes(q) && !m.phoneNumber.includes(q)) return false;
-    return true;
-  }).map(m => [m.FullName, m.phoneNumber, m.address, m.ward, m.pollingUnit, m.vin, (codes[`${m.ward}::${m.FullName}`] || codes[`${m.ward}::general`] || '')]);
-
-  if(rows.length === 0){ alert('No records to preview.'); return; }
-
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
-  const title = `Registrations${wardFilter ? ' - ' + wardFilter : ''}${unitFilter ? ' - ' + unitFilter : ''}`;
-  doc.setFontSize(14);
-  doc.text(title, 40, 40);
-
-  doc.autoTable({
-    startY: 60,
-    head: [[ 'FullName','Phone','Address','Ward','Polling Unit','VIN','Secure Code' ]],
-    body: rows,
-    styles: { fontSize: 9 }
-  });
-
-  const blob = doc.output('bloburl');
-  window.open(blob, '_blank');
-});
-
-function debounce(fn, ms){ let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
-
-fetchData();
-</script>
-    
-  <style>
-  /* Overlay for admin login */
-  #adminOverlay {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    animation: fadeIn 0.3s ease-in-out;
-  }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-  .admin-card {
-    background: #fff;
-    padding: 30px;
-    border-radius: 10px;
-    text-align: center;
-    width: 320px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    animation: slideDown 0.4s ease;
-  }
-  @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-  .admin-card h2 {
-    margin-bottom: 20px;
-    font-size: 20px;
-    color: #003049;
-  }
-  .admin-card input {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 15px;
-    text-align: center;
-  }
-  .admin-card button {
-    width: 100%;
-    padding: 12px;
-    background: #003049;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-  }
-  .admin-card button:hover {
-    background: #002233;
-  }
-  .error-msg {
-    color: red;
-    font-size: 14px;
-    margin-bottom: 8px;
-    display: none;
-  }
-  </style>
+    <!--
+<div class="assign-panel">
+  <input id="assignWard" placeholder="Assign general code to Ward" />
+  <input id="assignGeneralCode" placeholder="General secure code for ward" />
+  <button id="assignGeneralBtn">Assign to Ward</button>
+</div>
 -->
     <div id="adminOverlay">
   <div class="modal-box">
