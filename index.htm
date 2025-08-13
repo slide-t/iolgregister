@@ -1112,17 +1112,45 @@ document.getElementById("darkModeSwitch").addEventListener("change", function ()
 
   
   <script>
+function showSpinner(btnId, spinnerId) {
+  const btn = document.getElementById(btnId);
+  btn.querySelector('.btn-text').classList.add('hidden');
+  document.getElementById(spinnerId).classList.remove('hidden');
+  btn.disabled = true; // prevent double click
+}
+
+function hideSpinner(btnId, spinnerId) {
+  const btn = document.getElementById(btnId);
+  btn.querySelector('.btn-text').classList.remove('hidden');
+  document.getElementById(spinnerId).classList.add('hidden');
+  btn.disabled = false;
+}
+
 // Register button click
-document.getElementById('register-btn').addEventListener('click', function () {
-  document.querySelector('#register-btn .btn-text').classList.add('hidden');
-  document.getElementById('register-spinner').classList.remove('hidden');
+document.getElementById('register-btn').addEventListener('click', function (e) {
+  // Example: validate form first
+  const form = document.getElementById('jobForm');
+  if (!form.checkValidity()) {
+    e.preventDefault(); // stop submission
+    hideSpinner('register-btn', 'register-spinner');
+    return;
+  }
+  showSpinner('register-btn', 'register-spinner');
 });
 
 // Preview button click
 document.getElementById('preview-btn').addEventListener('click', function () {
-  document.querySelector('#preview-btn .btn-text').classList.add('hidden');
-  document.getElementById('preview-spinner').classList.remove('hidden');
-});  
+  showSpinner('preview-btn', 'preview-spinner');
+  // simulate preview load
+  setTimeout(() => hideSpinner('preview-btn', 'preview-spinner'), 1500);
+});
+
+// Example: when your modal closes on validation error, restore buttons
+document.getElementById('errorModalOkBtn')?.addEventListener('click', function () {
+  hideSpinner('register-btn', 'register-spinner');
+  hideSpinner('preview-btn', 'preview-spinner');
+});
+    
 </script>
 
 
