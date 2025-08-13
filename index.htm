@@ -83,6 +83,46 @@
   
     
   </style>
+  <style>
+    /* Common hidden utility */
+.hidden {
+  display: none;
+}
+
+/* Register spinner */
+.spinner {
+  border: 4px solid transparent;
+  border-top: 4px solid red;
+  border-right: 4px solid green;
+  border-bottom: 4px solid blue;
+  border-left: 4px solid yellow;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  animation: spin 1s linear infinite;
+  margin-left: 6px;
+}
+
+/* Preview spinner (grey) */
+.spinner-preview {
+  border: 4px solid transparent;
+  border-top: 4px solid grey;
+  border-right: 4px solid lightgrey;
+  border-bottom: 4px solid darkgrey;
+  border-left: 4px solid silver;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  animation: spin 1s linear infinite;
+  margin-left: 6px;
+}
+
+/* Spin animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+  </style>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>  
@@ -182,29 +222,23 @@
     <label for="partyId">Enter Party Membership ID:</label>  
     <input type="text" id="partyId" />  
   </div>  
+
 <!-- Register Button -->
 <div class="form-group">
   <button type="submit" id="register-btn" class="primary">
     Register <span id="register-spinner" class="spinner hidden"></span>
   </button>
 </div>
-  
-  <div class="form-group">  
-  <button type="button" id="preview-btn" class="preview-secondary">
-    Preview Registration
-    <span id="preview-spinner" class="preview-spinner" style="display:none;"></span>
-  </button>  
-</div>
 
-
-
-<!-- Preview Button --
+<!-- Preview Button -->
 <div class="form-group">
   <button type="button" id="preview-btn" class="secondary">
     Preview Registration <span id="preview-spinner" class="spinner-preview hidden"></span>
   </button>
 </div>
--->
+
+
+
   
 
   
@@ -702,8 +736,111 @@ previewBtn.addEventListener("click", () => {
 
 </script>
 
-
   
+<!-- SAME AS ABOVE
+<script>
+// ===== REGISTER BUTTON HANDLER =====
+const registerBtn = document.getElementById("register-btn");
+const registerSpinner = document.getElementById("register-spinner");
+
+biodataForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  registerBtn.disabled = true;
+  registerSpinner.classList.remove("hidden");
+
+  const formData = {
+    fullname: document.getElementById("fullname").value.trim(),
+    phoneNumber: (() => {
+      let raw = document.getElementById("phone").value.trim();
+      return raw.startsWith("+234") ? raw : "+234" + raw.replace(/^0/, "");
+    })(),
+    address: document.getElementById("address").value.trim(),
+    ward: wardEl.value,
+    pollingUnit: unitEl.value,
+    vin: vinEl.value.trim(),
+    gender: document.getElementById("gender").value
+  };
+
+  // Validation
+  const required = ["fullname", "phoneNumber", "address", "ward", "pollingUnit", "vin"];
+  for (let field of required) {
+    if (!formData[field]) {
+      alert("Please fill in all required fields.");
+      registerBtn.disabled = false;
+      registerSpinner.classList.add("hidden");
+      return;
+    }
+  }
+  if (formData.vin.length !== 19) {
+    alert("VIN must be exactly 19 characters.");
+    registerBtn.disabled = false;
+    registerSpinner.classList.add("hidden");
+    return;
+  }
+
+  try {
+    const res = await fetch("https://sheetdb.io/api/v1/ji8u767etbjge", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ data: [formData] })
+    });
+
+    if (!res.ok) throw new Error("Submission error");
+
+    alert("Member registered successfully!");
+    biodataForm.reset();
+    hideElement(biodataForm);
+    resetDropdown(lgaEl);
+    resetDropdown(wardEl);
+    resetDropdown(unitEl);
+    lgaGroup.classList.add("hidden");
+    wardGroup.classList.add("hidden");
+    unitGroup.classList.add("hidden");
+
+  } catch (err) {
+    console.error(err);
+    alert("Error submitting data.");
+  } finally {
+    registerBtn.disabled = false;
+    registerSpinner.classList.add("hidden");
+  }
+});
+
+// ===== PREVIEW BUTTON HANDLER =====
+const previewBtn = document.getElementById("preview-btn");
+const previewSpinner = document.getElementById("preview-spinner");
+
+previewBtn.addEventListener("click", () => {
+  previewSpinner.classList.remove("hidden");
+
+  setTimeout(() => {
+    previewSpinner.classList.add("hidden");
+
+    const formData = new FormData(biodataForm);
+    let tableHTML = "<table border='1' style='border-collapse:collapse;width:100%'><tr>";
+    formData.forEach((_, key) => {
+      tableHTML += `<th>${key}</th>`;
+    });
+    tableHTML += "</tr><tr>";
+    formData.forEach((value) => {
+      tableHTML += `<td>${value}</td>`;
+    });
+    tableHTML += "</tr></table>";
+
+    const newWindow = window.open("", "_blank");
+    newWindow.document.write(`
+      <html>
+        <head><title>Registration Preview</title></head>
+        <body>${tableHTML}</body>
+      </html>
+    `);
+    newWindow.document.close();
+  }, 2000);
+});
+  
+</script>
+  -->
  <!-- 
 <script>
 // Insert this right before your existing form submit listener or wrap it after your DOM logic
