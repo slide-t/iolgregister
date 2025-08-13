@@ -64,6 +64,23 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+.preview-spinner {
+  border: 3px solid #ccc;
+  border-top: 3px solid #555;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  animation: spin 1s linear infinite;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+  
     
   </style>
 
@@ -165,33 +182,32 @@
     <label for="partyId">Enter Party Membership ID:</label>  
     <input type="text" id="partyId" />  
   </div>  
-
 <!-- Register Button -->
 <div class="form-group">
   <button type="submit" id="register-btn" class="primary">
     Register <span id="register-spinner" class="spinner hidden"></span>
   </button>
 </div>
+  
+  <div class="form-group">  
+  <button type="button" id="preview-btn" class="preview-secondary">
+    Preview Registration
+    <span id="preview-spinner" class="preview-spinner" style="display:none;"></span>
+  </button>  
+</div>
 
-<!-- Preview Button -->
+
+
+<!-- Preview Button --
 <div class="form-group">
   <button type="button" id="preview-btn" class="secondary">
     Preview Registration <span id="preview-spinner" class="spinner-preview hidden"></span>
   </button>
 </div>
-
-  
-<!--
-  <div class="form-group">  
-    <button type="submit" id="register-btn">Register Member</button>  
-  </div>  
-
-  
-<!-- Preview Button --
-<div class="form-group">  
-  <button type="button" id="preview-btn" class="secondary">Preview Registration</button>  
-</div>
 -->
+  
+
+  
 
   
 
@@ -526,6 +542,63 @@ const data = {
     el.classList.add("hidden");
   }   
 </script>
+
+<!--
+  <script>
+// Disable Register Button on Submit
+document.getElementById("register-btn")?.addEventListener("click", function() {
+  this.disabled = true;
+});
+
+// Preview & Download PDF
+document.getElementById("preview-btn").addEventListener("click", function () {
+  const previewSpinner = document.getElementById("preview-spinner");
+  previewSpinner.style.display = "inline-block";
+
+  // Collect form data
+  const formData = {
+    "Full Name": document.getElementById("fullName")?.value || "",
+    "Phone Number": document.getElementById("phoneNumber")?.value || "",
+    "Gender": document.getElementById("gender")?.value || "",
+    "State": document.getElementById("state")?.value || "",
+    "LGA": document.getElementById("lga")?.value || "",
+    "Ward": document.getElementById("ward")?.value || "",
+    "Polling Unit": document.getElementById("pollingUnit")?.value || ""
+  };
+
+  setTimeout(() => {
+    previewSpinner.style.display = "none";
+
+    // Create HTML table
+    let tableHTML = `
+      <table border="1" style="border-collapse:collapse; width:100%;">
+        <tr><th>Field</th><th>Value</th></tr>
+        ${Object.entries(formData)
+          .map(([key, value]) => `<tr><td>${key}</td><td>${value}</td></tr>`)
+          .join("")}
+      </table>
+    `;
+
+    // Open new window for preview
+    const newWin = window.open("", "_blank");
+    newWin.document.write(`
+      <html><head><title>Registration Preview</title></head>
+      <body>
+        ${tableHTML}
+        <script>
+          window.print();
+        <\/script>
+      </body></html>
+    `);
+    newWin.document.close();
+
+  }, 2000); // Spinner duration
+});
+
+
+  </script>
+-->
+  
 <script>
 // ===== REGISTER BUTTON HANDLER =====
 const registerBtn = document.getElementById("register-btn");
