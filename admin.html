@@ -335,86 +335,46 @@ fetchData();
     margin-bottom: 8px;
     display: none;
   }
-</style>
-
-<div id="adminOverlay">
-  <div class="admin-card">
-    <h2>Admin Access</h2>
-    <div class="error-msg" id="errorMsg">Invalid Access Key</div>
-    <input type="password" id="adminKey" placeholder="Enter Access Key" />
-    <button onclick="checkAdminKey()">Enter</button>
-  </div>
-</div>
+  </style>
 -->
-    
-<div id="adminOverlay">
-  <div class="admin-card">
+    <div id="adminOverlay">
+  <div class="modal-box">
     <h2>Admin Access</h2>
-    <div class="error-msg" id="errorMsg">Invalid Access Key</div>
-    <input type="password" id="adminKey" placeholder="Enter Access Key" />
+    <input type="password" id="adminKey" placeholder="Enter Access Key">
+    <p id="errorMsg" style="display:none; color:red; font-size:14px; margin-top:8px;">
+      Incorrect key. Try again.
+    </p>
     <button onclick="checkAdminKey()">Enter</button>
   </div>
 </div>
+
     
 <script>
-function checkAdminKey() {
-  const keyInput = document.getElementById("adminKey");
-  const errorMsg = document.getElementById("errorMsg");
-  const overlay = document.getElementById("adminOverlay");
-  const correctKey = "justJimi2027";
+function checkAdminKey(){
+    const keyInput = document.getElementById("adminKey");
+    const errorMsg = document.getElementById("errorMsg");
+    const overlay = document.getElementById("adminOverlay");
 
-  if (keyInput.value.trim() === correctKey) {
-    overlay.classList.add("hidden");
-    document.body.style.overflow = "auto"; // allow scroll after fade-out
-    setTimeout(() => overlay.style.display = "none", 400); // remove after fade
-  } else {
-    errorMsg.style.display = "block";
-    keyInput.value = "";
-    keyInput.focus();
-  }
+    if(keyInput.value.trim() === "justJimi2027"){
+        overlay.classList.add("hidden");
+        setTimeout(() => {
+            overlay.style.display = "none";
+        }, 400); // match fade-out time
+    } else {
+        errorMsg.style.display = "block";
+        keyInput.value = "";
+        keyInput.focus();
+    }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const keyInput = document.getElementById("adminKey");
-  document.body.style.overflow = "hidden"; // lock scroll until login
-  keyInput.focus();
-  keyInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-      checkAdminKey();
-    }
-  });
+    const keyField = document.getElementById("adminKey");
+    setTimeout(() => keyField.focus(), 100);
 });
+    
 
   
-  /*function checkAdminKey() {
-  const keyInput = document.getElementById("adminKey");
-  const errorMsg = document.getElementById("errorMsg");
-  const overlay = document.getElementById("adminOverlay");
 
-  // Admin password (could be moved to server-side check for better security)
-  const correctKey = "justJimi2027";
-
-  if (keyInput.value.trim() === correctKey) {
-    overlay.style.display = "none";
-    document.body.style.overflow = "auto"; // allow scrolling again
-  } else {
-    errorMsg.style.display = "block";
-    keyInput.value = "";
-    keyInput.focus();
-  }
-}
-
-// Enable pressing "Enter" to submit
-document.addEventListener("DOMContentLoaded", () => {
-  const keyInput = document.getElementById("adminKey");
-  keyInput.focus();
-  keyInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-      checkAdminKey();
-    }
-  });
-});
-  */
 </script>
 
   <script src="admin.js"></script>
