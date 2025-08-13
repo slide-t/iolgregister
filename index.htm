@@ -1138,24 +1138,31 @@ document.getElementById('register-btn').addEventListener('click', function (e) {
   showSpinner('register-btn', 'register-spinner');
 });
 
-// Preview button click
+// Preview button click (Download PDF)
 document.getElementById('preview-btn').addEventListener('click', function () {
   showSpinner('preview-btn', 'preview-spinner');
 
   try {
-    // Replace the URL below with your actual preview PDF generator endpoint
-    const pdfUrl = '/path/to/preview.pdf'; 
-    window.open(pdfUrl, '_blank');
+    // Replace this URL with your actual generated PDF file path
+    const pdfUrl = '/path/to/preview.pdf';
 
-    // Stop spinner after opening the new tab
+    // Create a hidden link for download
+    const link = document.createElement('a');
+    link.href = pdfUrl;
+    link.download = 'registration-preview.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Stop spinner after triggering download
     hideSpinner('preview-btn', 'preview-spinner');
   } catch (error) {
-    console.error('Preview failed:', error);
+    console.error('Download failed:', error);
     hideSpinner('preview-btn', 'preview-spinner'); // Ensure spinner stops
   }
 });
 
-// Example: when your modal closes on validation error, restore buttons
+// Restore buttons if validation error modal closes
 document.getElementById('errorModalOkBtn')?.addEventListener('click', function () {
   hideSpinner('register-btn', 'register-spinner');
   hideSpinner('preview-btn', 'preview-spinner');
@@ -1166,6 +1173,8 @@ document.getElementById('errorModalOkBtn')?.addEventListener('click', function (
   hideSpinner('register-btn', 'register-spinner');
   hideSpinner('preview-btn', 'preview-spinner');
 });
+
+
     
 </script>
 
