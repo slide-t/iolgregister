@@ -4,6 +4,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>  
   <title>Group Member Registration</title>  
   <link rel="stylesheet" href="style.css"/>  
+  <!--
   <style>  
     /* Minimal safety CSS so the preview looks ok if style.css missing */  
     body { font-family: Arial, sans-serif; background:#f7f9fc; padding:20px; }  
@@ -24,7 +25,7 @@
   100% { transform: rotate(360deg); }
 }
 </style>
-
+-->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>  
 </head>  
@@ -468,81 +469,7 @@ const data = {
   }
   function hideElement(el) {
     el.classList.add("hidden");
-  }
-
-
-    /*
-  // ====== Form submit with VIN duplicate check ======
-  biodataForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const formData = {
-      fullname: document.getElementById("fullname").value.trim(),
-      phoneNumber: (() => {
-        let rawPhone = document.getElementById("phone").value.trim();
-        if (!rawPhone.startsWith("+234")) {
-          rawPhone = "+234" + rawPhone.replace(/^0/, "");
-        }
-        return rawPhone;
-      })(),
-      address: document.getElementById("address").value.trim(),
-      ward: wardEl.value,
-      pollingUnit: unitEl.value,
-      vin: vinEl.value.trim(),
-      gender: document.getElementById("gender").value
-    };
-
-    // Basic validation
-    const required = ["fullname", "phoneNumber", "address", "ward", "pollingUnit", "vin"];
-    for (const id of required) {
-      if (!formData[id]) {
-        alert("Please fill in all required fields.");
-        return;
-      }
-    }
-
-    // VIN length check (optional, adjust if needed)
-    if (formData.vin.length !== 19) {
-      alert("VIN must be exactly 19 characters.");
-      return;
-    }
-
-    try {
-      // Check for duplicate VIN
-      const checkRes = await fetch(`${sheetDB_URL}/search?vin=${encodeURIComponent(formData.vin)}`);
-      if (!checkRes.ok) throw new Error("Failed to check VIN");
-
-      const existing = await checkRes.json();
-
-      if (existing.length > 0) {
-        alert("This VIN has already been registered. Duplicate registrations are not allowed.");
-        return;
-      }
-
-      // Submit new record
-      const sheetPayload = { data: [formData] };
-      const sheetRes = await fetch(sheetDB_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(sheetPayload)
-      });
-
-      if (!sheetRes.ok) throw new Error("SheetDB submission failed");
-
-      alert("Member registered successfully!");
-      e.target.reset();
-      hideElement(biodataForm);
-      resetDropdown(lgaEl);
-      resetDropdown(wardEl);
-      resetDropdown(unitEl);
-      lgaGroup.classList.add("hidden");
-      wardGroup.classList.add("hidden");
-      unitGroup.classList.add("hidden");
-    } catch (err) {
-      console.error(err);
-      alert("Error submitting data.");
-    }
-  });*/
+  }   
 </script>
   <style>
 /* 4-color spinner */
