@@ -31,11 +31,13 @@
       .controls { grid-template-columns:1fr; }
       .assign-panel { grid-template-columns:1fr; }
     }
-/* Overlay for admin login */
+/* Overlay for admin login (transparent top/bottom) */
 #adminOverlay {
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.65); /* softer overlay */
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.65); /* dim background */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -48,15 +50,20 @@
   to { opacity: 1; }
 }
 
+/* Card covers half the viewport height */
 .admin-card {
   background: #fff;
   padding: 28px 22px;
   border-radius: 12px;
   text-align: center;
   width: 92%;
-  max-width: 360px;
+  max-width: 420px;
+  height: 50vh; /* Half the page height */
   box-shadow: 0 5px 25px rgba(0,0,0,0.2);
   animation: slideDown 0.35s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* centers content inside */
 }
 
 @keyframes slideDown {
@@ -79,7 +86,6 @@
   border: 1px solid #ccc;
   font-size: 15px;
   text-align: center;
-  outline: none;
 }
 
 .admin-card button {
@@ -92,7 +98,6 @@
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s;
 }
 
 .admin-card button:hover {
@@ -104,10 +109,4 @@
   font-size: 14px;
   margin-bottom: 8px;
   display: none;
-  animation: fadeError 0.25s ease;
-}
-
-@keyframes fadeError {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
 }
