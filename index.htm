@@ -737,262 +737,73 @@ document.getElementById("darkModeSwitch").addEventListener("change", function ()
 });
 </script>
   
+  <!-- Preview Button --
+<div class="form-group">  
+  <button type="button" id="preview-btn" class="secondary">Preview Registration</button>  
+</div>
+-->
+<!-- Spinner for preview -->
+<div id="preview-spinner" style="display:none; text-align:center; margin-top:10px;">
+  <div style="border: 4px solid #ccc; border-top: 4px solid #888; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin:auto;"></div>
+</div>
 
+<style>
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-document.getElementById("preview-btn").addEventListener("click", () => {
-  const spinner = document.getElementById("preview-spinner");
-  spinner.style.display = "block";
+document.getElementById("preview-btn").addEventListener("click", function () {
+    const fullname = document.getElementById("fullname").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const address = document.getElementById("address").value.trim();
+    const ward = document.getElementById("ward")?.value || "";
+    const unit = document.getElementById("unit")?.value || "";
+    const vin = document.getElementById("vin").value.trim();
+    const gender = document.getElementById("gender").value;
 
-  setTimeout(() => {
-    spinner.style.display = "none";
+    if (!fullname || !phone || !address || !ward || !unit || !vin) {
+        alert("Please fill all required fields before preview.");
+        return;
+    }
 
-    // Collect form data
-    const formData = {
-      Fullname: document.getElementById("fullname").value.trim(),
-      Phone: document.getElementById("phone").value.trim(),
-      Address: document.getElementById("address").value.trim(),
-      Ward: document.getElementById("ward").value.trim(),
-      "Polling Unit": document.getElementById("pollingUnit").value.trim(),
-      VIN: document.getElementById("vin").value.trim(),
-      Gender: document.getElementById("gender").value
-    };
+    // Show spinner
+    document.getElementById("preview-spinner").style.display = "block";
 
-    // Create PDF in table format
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+    setTimeout(() => {
+        // Hide spinner
+        document.getElementById("preview-spinner").style.display = "none";
 
-    doc.setFontSize(16);
-    doc.text("Registration Preview", 14, 20);
+        // Generate table HTML
+        const tableHTML = `
+        <table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+            <tr><th>Full Name</th><td>${fullname}</td></tr>
+            <tr><th>Phone Number</th><td>${phone}</td></tr>
+            <tr><th>Address</th><td>${address}</td></tr>
+            <tr><th>Ward</th><td>${ward}</td></tr>
+            <tr><th>Polling Unit</th><td>${unit}</td></tr>
+            <tr><th>VIN</th><td>${vin}</td></tr>
+            <tr><th>Gender</th><td>${gender}</td></tr>
+        </table>
+        `;
 
-    let startY = 30;
-    Object.entries(formData).forEach(([key, value]) => {
-      doc.rect(14, startY, 50, 10);
-      doc.text(key, 16, startY + 7);
-
-      doc.rect(64, startY, 130, 10);
-      doc.text(value || "-", 66, startY + 7);
-
-      startY += 10;
-    });
-
-    // Open PDF in browser
-    window.open(doc.output('bloburl'), '_blank');
-  }, 800); // Simulate loading
+        // Create PDF
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.html(tableHTML, {
+            callback: function (doc) {
+                doc.output("dataurlnewwindow"); // Opens in browser
+            },
+            x: 10,
+            y: 10
+        });
+    }, 500); // Small delay to show spinner
 });
 </script>
-  
-  
-  <!--
-<script>  
-  // ====== LOCATION DATA (placeholder wards) ======  
-  const data = {
-    ogun: {
-        "Ijebu Ode": {
-            "Ward-1": [
-                "001-Beside Co-Operative Building (Existing)",
-                "002-Emmanuel School I, Italupe (Existing)",
-                "003-Moslem School, Isoku (Existing)"
-            ],
-            "Ward-2": [
-                "001-Baptist Day School, Ereko (Existing)",
-                "002-Front of Our Lady’s School (Existing)",
-                "003-Front of Alhaji Kukoyi’s House (Existing)"
-            ]
-        }
-    }
-};
-// ====== DOM elements ======
-const stateEl = document.getElementById("state");
-const lgaEl = document.getElementById("lga");
-const wardEl = document.getElementById("ward");
-const unitEl = document.getElementById("unit");
-const lgaGroup = document.getElementById("lga-group");
-const wardGroup = document.getElementById("ward-group");
-const unitGroup = document.getElementById("unit-group");
-const biodataForm = document.getElementById("biodata-form");
-const dobEl = document.getElementById("dob");
-const ageEl = document.getElementById("age");
-const isVoterEl = document.getElementById("isVoter");
-const vinGroup = document.getElementById("vin-group");
-const vinEl = document.getElementById("vin");
-const isPartyEl = document.getElementById("isPartyMember");
-const partyIdGroup = document.getElementById("party-id-group");
-const regTime = document.getElementById("regTime");
-const timestampGroup = document.getElementById("timestamp-group");
 
-// ====== SheetDB endpoint ======
-const sheetDB_URL = "https://sheetdb.io/api/v1/ji8u767etbjge";
-
-// ====== Populate dropdowns ======
-stateEl.addEventListener("change", () => {
-const state = stateEl.value.toLowerCase();
-resetDropdown(lgaEl); resetDropdown(wardEl); resetDropdown(unitEl);
-hideElement(biodataForm); hideElement(wardGroup); hideElement(unitGroup);
-if (data[state]) {
-lgaGroup.classList.remove("hidden");
-for (let lga in data[state]) {
-const opt = document.createElement("option");
-opt.value = lga; opt.textContent = lga;
-lgaEl.appendChild(opt);
-}
-} else lgaGroup.classList.add("hidden");
-});
-
-lgaEl.addEventListener("change", () => {
-const state = stateEl.value.toLowerCase();
-const lga = lgaEl.value;
-resetDropdown(wardEl); resetDropdown(unitEl);
-hideElement(biodataForm); hideElement(unitGroup);
-if (data[state] && data[state][lga]) {
-wardGroup.classList.remove("hidden");
-for (let ward in data[state][lga]) {
-const opt = document.createElement("option");
-opt.value = ward; opt.textContent = ward;
-wardEl.appendChild(opt);
-}
-} else wardGroup.classList.add("hidden");
-});
-
-wardEl.addEventListener("change", () => {
-const state = stateEl.value.toLowerCase();
-const lga = lgaEl.value;
-const ward = wardEl.value;
-resetDropdown(unitEl);
-hideElement(biodataForm);
-if (data[state] && data[state][lga] && data[state][lga][ward]) {
-unitGroup.classList.remove("hidden");
-data[state][lga][ward].forEach(unit => {
-const opt = document.createElement("option");
-opt.value = unit; opt.textContent = unit;
-unitEl.appendChild(opt);
-});
-} else unitGroup.classList.add("hidden");
-});
-
-unitEl.addEventListener("change", () => {
-if (unitEl.value) biodataForm.classList.remove("hidden");
-else biodataForm.classList.add("hidden");
-});
-
-// ====== Age calculation ======
-dobEl.addEventListener("change", () => {
-if (!dobEl.value) { ageEl.value = ""; return; }
-const dob = new Date(dobEl.value);
-const today = new Date();
-let age = today.getFullYear() - dob.getFullYear();
-const m = today.getMonth() - dob.getMonth();
-if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
-ageEl.value = age;
-});
-
-// ====== VIN & Party toggles ======
-isVoterEl.addEventListener("change", () => {
-vinGroup.classList.toggle("hidden", isVoterEl.value !== "yes");
-if (isVoterEl.value !== "yes") vinEl.value = "";
-});
-
-isPartyEl.addEventListener("change", () => {
-partyIdGroup.classList.toggle("hidden", isPartyEl.value !== "yes");
-if (isPartyEl.value !== "yes") document.getElementById("partyId").value = "";
-});
-
-// ====== Admin timestamp ======
-document.addEventListener("DOMContentLoaded", () => {
-const isAdmin = true;
-if (isAdmin) {
-timestampGroup.classList.remove("hidden");
-regTime.value = new Date().toLocaleString();
-}
-});
-
-// ====== Utilities ======
-function resetDropdown(dropdown) { dropdown.innerHTML = '<option value="">-- Select --</option>'; }
-function hideElement(el) { el.classList.add("hidden"); }
-
-  // ====== Form submit (SheetDB only) ======
-document.getElementById("biodata-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-
- const formData = {
-    fullname: document.getElementById("fullname").value.trim(),
-    phoneNumber: (() => {
-        let rawPhone = document.getElementById("phone").value.trim();
-        if (!rawPhone.startsWith("+234")) {
-            rawPhone = "+234" + rawPhone.replace(/^0/, "");
-        }
-        return rawPhone;
-    })(),
-    address: document.getElementById("address").value.trim(),
-    ward: wardEl.value,
-    pollingUnit: unitEl.value,
-    vin: document.getElementById("vin").value.trim(),
-    gender: document.getElementById("gender").value
-};
-  
-  
-  // Basic validation
-  const required = ["fullname", "phoneNumber","address","ward","pollingUnit","vin"];
-  for (const id of required) {
-    if (!formData[id]) {
-      alert("Please fill in all required fields.");
-      return;
-    }
-  }
-
-  try {
-    const sheetPayload = { data: [formData] };
-    const sheetRes = await fetch(sheetDB_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(sheetPayload)
-    });
-
-    if (!sheetRes.ok) throw new Error("SheetDB submission failed");
-
-    alert("Member registered successfully!");
-    e.target.reset();
-    hideElement(biodataForm);
-    resetDropdown(lgaEl);
-    resetDropdown(wardEl);
-    resetDropdown(unitEl);
-    lgaGroup.classList.add("hidden");
-    wardGroup.classList.add("hidden");
-    unitGroup.classList.add("hidden");
-  } catch (err) {
-    console.error(err);
-    alert("Error submitting data.");
-  }
-});
-  
-  
-document.getElementById("myForm").addEventListener("submit", function (e) {
-e.preventDefault();
-
-const formData = new FormData(this);  
-const jsonData = {};  
-formData.forEach((value, key) => jsonData[key] = value);  
-
-fetch("https://sheetdb.io/api/v1/ji8u767etbjge", {  
-    method: "POST",  
-    headers: { "Content-Type": "application/json" },  
-    body: JSON.stringify({ data: jsonData })  
-})  
-.then(res => res.json())  
-.then(response => {  
-    console.log("Success:", response);  
-    alert("Data submitted successfully!");  
-    this.reset(); // Clears the form  
-})  
-.catch(error => {  
-    console.error("Error:", error);  
-    alert("Submission failed. Try again.");  
-});
-
-});
-</script>
--->
 
 </body>  
 </html>
