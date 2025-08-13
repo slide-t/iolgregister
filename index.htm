@@ -1141,8 +1141,24 @@ document.getElementById('register-btn').addEventListener('click', function (e) {
 // Preview button click
 document.getElementById('preview-btn').addEventListener('click', function () {
   showSpinner('preview-btn', 'preview-spinner');
-  // simulate preview load
-  setTimeout(() => hideSpinner('preview-btn', 'preview-spinner'), 1500);
+
+  try {
+    // Replace the URL below with your actual preview PDF generator endpoint
+    const pdfUrl = '/path/to/preview.pdf'; 
+    window.open(pdfUrl, '_blank');
+
+    // Stop spinner after opening the new tab
+    hideSpinner('preview-btn', 'preview-spinner');
+  } catch (error) {
+    console.error('Preview failed:', error);
+    hideSpinner('preview-btn', 'preview-spinner'); // Ensure spinner stops
+  }
+});
+
+// Example: when your modal closes on validation error, restore buttons
+document.getElementById('errorModalOkBtn')?.addEventListener('click', function () {
+  hideSpinner('register-btn', 'register-spinner');
+  hideSpinner('preview-btn', 'preview-spinner');
 });
 
 // Example: when your modal closes on validation error, restore buttons
