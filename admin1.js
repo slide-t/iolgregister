@@ -1,6 +1,96 @@
+const ADMIN_SHEET_URL = "https://sheetdb.io/api/v1/45mblkhz4vrjc";
+
+// ===== Assign General Code =====
+document.getElementById("assignGeneralBtn").addEventListener("click", () => {
+  const ward = document.getElementById("assignWard").value.trim();
+  const code = document.getElementById("assignGeneralCode").value.trim();
+
+  if (!ward || !code) {
+    alert("Please enter both Ward and Secure Code.");
+    return;
+  }
+
+  const btn = document.getElementById("assignGeneralBtn");
+  btn.disabled = true;
+  btn.textContent = "Assigning...";
+
+  fetch(`${ADMIN_SHEET_URL}/search?ward=${encodeURIComponent(ward)}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.length > 0) {
+        // Update existing ward code
+        fetch(`${ADMIN_SHEET_URL}/ward/${encodeURIComponent(ward)}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ secure_code: code })
+        })
+        .then(() => alert(`Code updated for ${ward}`))
+        .catch(err => console.error(err))
+        .finally(() => {
+          btn.disabled = false;
+          btn.textContent = "Assign to Ward";
+        });
+      } else {
+        // Create new entry
+        fetch(ADMIN_SHEET_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify([{ ward: ward, secure_code: code, device_id: "" }])
+        })
+        .then(() => alert(`Code assigned to ${ward}`))
+        .catch(err => console.error(err))
+        .finally(() => {
+          btn.disabled = false;
+          btn.textContent = "Assign to Ward";
+        });
+      }
+    });
+});
+
+// ===== Revoke Device =====
+document.getElementById("revokeDeviceBtn").addEventListener("click", () => {
+  const ward = document.getElementById("revokeWard").value.trim();
+
+  if (!ward) {
+    alert("Please enter the Ward to revoke.");
+    return;
+  }
+
+  if (!confirm(`Are you sure you want to revoke the device for ${ward}?`)) {
+    return;
+  }
+
+  const btn = document.getElementById("revokeDeviceBtn");
+  btn.disabled = true;
+  btn.textContent = "Revoking...";
+
+  fetch(`${ADMIN_SHEET_URL}/search?ward=${encodeURIComponent(ward)}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.length === 0) {
+        alert(`No record found for ward: ${ward}`);
+      } else {
+        fetch(`${ADMIN_SHEET_URL}/ward/${encodeURIComponent(ward)}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ device_id: "" })
+        })
+        .then(() => alert(`Device revoked for ${ward}`))
+        .catch(err => console.error(err));
+      }
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.textContent = "Revoke Device";
+    });
+});
 
 
 
+
+
+
+/*
 // --- Configuration ---
 const SHEETDB_URL = 'https://sheetdb.io/api/v1/ji8u767etbjge';
 
