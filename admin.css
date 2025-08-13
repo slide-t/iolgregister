@@ -31,77 +31,68 @@
       .controls { grid-template-columns:1fr; }
       .assign-panel { grid-template-columns:1fr; }
     }
-/* Overlay for admin login */
+
+
+/* Overlay - half page height */
 #adminOverlay {
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(255, 255, 255, 0.3); /* Transparent white glass effect */
-  backdrop-filter: blur(6px); /* Frosted glass blur */
+  top: 25%;  /* pushes it down so it covers middle half */
+  left: 0;
+  width: 100%;
+  height: 50%; /* half screen */
+  background: rgba(0, 0, 0, 0.4); /* transparent dim */
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
   opacity: 1;
-  visibility: visible;
-  transition: opacity 0.4s ease, visibility 0.4s ease;
+  transition: opacity 0.4s ease;
 }
 
 /* Hidden state */
 #adminOverlay.hidden {
   opacity: 0;
-  visibility: hidden;
+  pointer-events: none;
 }
 
-.admin-card {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 30px;
+/* Modal box */
+#adminOverlay .modal-box {
+  background: white;
+  padding: 20px;
   border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 400px;
   text-align: center;
-  width: 320px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-  animation: slideDown 0.4s ease;
+  transform: scale(1);
+  transition: transform 0.3s ease;
 }
 
-@keyframes slideDown {
-  from { transform: translateY(-20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+#adminOverlay.hidden .modal-box {
+  transform: scale(0.9);
 }
 
-.admin-card h2 {
-  margin-bottom: 20px;
-  font-size: 20px;
-  color: #003049;
-}
-
-.admin-card input {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 15px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 15px;
-  text-align: center;
-}
-
-.admin-card button {
-  width: 100%;
-  padding: 12px;
-  background: #003049;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
+/* Input & button styling */
+#adminOverlay input {
+  width: 90%;
+  padding: 10px;
+  margin-top: 10px;
   font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+#adminOverlay button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background: #004466;
+  color: white;
+  border: none;
+  border-radius: 5px;
   cursor: pointer;
 }
 
-.admin-card button:hover {
-  background: #002233;
-}
 
-.error-msg {
-  color: red;
-  font-size: 14px;
-  margin-bottom: 8px;
-  display: none;
-}
+  
+  
