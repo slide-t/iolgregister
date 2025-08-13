@@ -27,37 +27,37 @@
 </style>-->
   
   <style>
-/* Common hidden utility */
+  /* Common hidden utility */
 .hidden {
   display: none;
 }
 
-/* Base spinner style */
-.spinner,
-.spinner-preview {
-  border: 3px solid transparent;
+/* Register spinner */
+.spinner {
+  border: 4px solid transparent;
+  border-top: 4px solid red;
+  border-right: 4px solid green;
+  border-bottom: 4px solid blue;
+  border-left: 4px solid yellow;
   border-radius: 50%;
   width: 18px;
   height: 18px;
   animation: spin 1s linear infinite;
-  vertical-align: middle;
-  display: inline-block;
+  margin-left: 6px;
 }
 
-/* Multi-color spinner for Register */
-.spinner {
-  border-top: 3px solid red;
-  border-right: 3px solid green;
-  border-bottom: 3px solid blue;
-  border-left: 3px solid yellow;
-}
-
-/* Grey-tone spinner for Preview */
+/* Preview spinner (grey) */
 .spinner-preview {
-  border-top: 3px solid grey;
-  border-right: 3px solid lightgrey;
-  border-bottom: 3px solid darkgrey;
-  border-left: 3px solid silver;
+  border: 4px solid transparent;
+  border-top: 4px solid grey;
+  border-right: 4px solid lightgrey;
+  border-bottom: 4px solid darkgrey;
+  border-left: 4px solid silver;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  animation: spin 1s linear infinite;
+  margin-left: 6px;
 }
 
 /* Spin animation */
@@ -66,30 +66,22 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Button styling */
-button.primary,
-button.secondary {
-  position: relative;
-  min-width: 160px; /* Keeps width consistent when text hides */
-  min-height: 40px;
-  font-size: 14px;
-  cursor: pointer;
+.preview-spinner {
+  border: 3px solid #ccc;
+  border-top: 3px solid #555;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  animation: spin 1s linear infinite;
+  margin-left: 8px;
+  vertical-align: middle;
 }
 
-/* Spinner centered inside button when active */
-button.loading {
-  color: transparent; /* Hide text */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
-
-button.loading .spinner,
-button.loading .spinner-preview {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  display: inline-block !important;
-}
-   
   </style>
   
   
