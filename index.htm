@@ -743,15 +743,68 @@ document.getElementById("darkModeSwitch").addEventListener("change", function ()
   
 <!-- preview button css-->
 <style>
+  .spinner {
+  border: 4px solid #ccc; /* Light grey */
+  border-top: 4px solid #555; /* Darker grey */
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin: 10px auto;
+}
+
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 document.getElementById("preview-btn").addEventListener("click", function () {
+    let spinner = document.getElementById("preview-spinner");
+    spinner.style.display = "block";
+
+    // Collect form data
+    let formData = {
+        fullName: document.getElementById("fullName").value,
+        phoneNumber: document.getElementById("phoneNumber").value,
+        gender: document.getElementById("gender").value,
+        state: document.getElementById("state").value,
+        lga: document.getElementById("lga").value,
+        ward: document.getElementById("ward").value,
+        pollingUnit: document.getElementById("pollingUnit").value
+    };
+
+    // Wait 2 seconds to simulate loading
+    setTimeout(() => {
+        spinner.style.display = "none";
+
+        // Create table HTML for PDF
+        let tableHTML = `
+            <h2>Registration Preview</h2>
+            <table border="1" cellspacing="0" cellpadding="5">
+                <tr><th>Field</th><th>Value</th></tr>
+                ${Object.entries(formData).map(([key, value]) => 
+                    `<tr><td>${key}</td><td>${value || "-"}</td></tr>`
+                ).join("")}
+            </table>
+        `;
+
+        // Create PDF
+        let win = window.open("", "_blank");
+        win.document.write(`
+            <html>
+            <head><title>Registration Preview</title></head>
+            <body>${tableHTML}</body>
+            </html>
+        `);
+        win.document.close();
+    }, 2000);
+});
+  
+  /*document.getElementById("preview-btn").addEventListener("click", function () {
     const fullname = document.getElementById("fullname").value.trim();
     const phone = document.getElementById("phone").value.trim();
     const address = document.getElementById("address").value.trim();
@@ -796,7 +849,7 @@ document.getElementById("preview-btn").addEventListener("click", function () {
             y: 10
         });
     }, 500); // Small delay to show spinner
-});
+});*/
 </script>
 
 
