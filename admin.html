@@ -96,7 +96,10 @@
     <span id="assignBtnSpinner" class="assign-spinner" style="display:none;"></span>
   </button>
 </div>
-
+<div class="revoke-panel">
+  <input id="revokeCode" placeholder="Secure Code or Ward to Revoke" />
+  <button id="revokeDeviceBtn">Revoke Device</button>
+</div>
 <style>
   /* Unique spinner for assign button */
   .assign-spinner {
@@ -114,6 +117,42 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
+.revoke-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.revoke-panel input {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+#revokeDeviceBtn {
+  background-color: #e74c3c; /* red for revoke */
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#revokeDeviceBtn:hover {
+  background-color: #c0392b;
+}
+
+#revokeDeviceBtn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+  
 </style>
 
 <script>
