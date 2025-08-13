@@ -124,37 +124,29 @@
     <label for="partyId">Enter Party Membership ID:</label>  
     <input type="text" id="partyId" />  
   </div>  
-<!-- Register Button -->
-<div class="form-group">
-  <button type="submit" id="register-btn" class="primary">
-    Register
-  </button>
-  <div id="register-spinner" class="spinner hidden"></div>
-</div>
 
-<!-- Preview Button -->
-<div class="form-group">
-  <button type="button" id="preview-btn" class="secondary">
-    Preview Registration
-  </button>
-  <div id="preview-spinner" class="spinner-preview hidden"></div>
-</div>
+
+
   
-<!--
+
   <div class="form-group">  
     <button type="submit" id="register-btn">Register Member</button>  
   </div>  
+<div class="spinner" style="display:none; text-align:center; margin-top:10px;">
+  <div style="border: 4px solid #ccc; border-top: 4px solid #888; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin:auto;"></div>
+</div>
+
   
-<!-- Preview Button --
+<!-- Preview Button -->
 <div class="form-group">  
   <button type="button" id="preview-btn" class="secondary">Preview Registration</button>  
 </div>
 
-<!-- Spinner for preview --
+<!-- Spinner for preview -->
 <div id="preview-spinner" style="display:none; text-align:center; margin-top:10px;">
   <div style="border: 4px solid #ccc; border-top: 4px solid #888; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin:auto;"></div>
 </div>
-  -->
+  
 
 
   <!-- Admin only field -->  
@@ -607,7 +599,7 @@ biodataForm.addEventListener("submit", async function(e) {
 });
 </script>
 
-  <!-- New js dor register and preview button-->
+  <!-- New js dor register and preview button--
 <script>
   // REGISTER BUTTON HANDLER
 document.getElementById("register-btn").addEventListener("click", function (e) {
@@ -653,7 +645,7 @@ document.getElementById("preview-btn").addEventListener("click", function () {
   }, 2000);
 });
 </script>
-  
+  -->
   <!-- dark mode switch css-->
 <style>
 /* Base styling */
@@ -824,7 +816,7 @@ document.getElementById("darkModeSwitch").addEventListener("change", function ()
 </script>
   
   
-<!-- preview button css--
+<!-- preview button css-->
 <style>
   .preview-spinner {
   width: 30px;
@@ -847,7 +839,9 @@ document.getElementById("darkModeSwitch").addEventListener("change", function ()
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script>
+
+  <script>
+    // Note- This is the working js
 /*document.getElementById("preview-btn").addEventListener("click", function () {
   const spinner = document.getElementById("preview-spinner");
   
@@ -896,18 +890,9 @@ document.getElementById("darkModeSwitch").addEventListener("change", function ()
   }, 2000);
 });
   
+  // Reminant js to be deleted 
   
-  
-  /*document.getElementById("preview-btn").addEventListener("click", function () {
-    let spinner = document.getElementById("preview-spinner");
-    spinner.style.display = "block";
-
-    // Collect form data
-    let formData = {
-        fullName: document.getElementById("fullName").value,
-        phoneNumber: document.getElementById("phoneNumber").value,
-        gender: document.getElementById("gender").value,
-        state: document.getElementById("state").value,
+  /*", getElementById("state").value,
         lga: document.getElementById("lga").value,
         ward: document.getElementById("ward").value,
         pollingUnit: document.getElementById("pollingUnit").value
@@ -939,7 +924,7 @@ document.getElementById("darkModeSwitch").addEventListener("change", function ()
         win.document.close();
     }, 2000);
 });
-  
+  // Ro be deleted 
   /*document.getElementById("preview-btn").addEventListener("click", function () {
     const fullname = document.getElementById("fullname").value.trim();
     const phone = document.getElementById("phone").value.trim();
