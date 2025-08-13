@@ -357,8 +357,36 @@ fetchData();
 </div>
     
 <script>
-
 function checkAdminKey() {
+  const keyInput = document.getElementById("adminKey");
+  const errorMsg = document.getElementById("errorMsg");
+  const overlay = document.getElementById("adminOverlay");
+  const correctKey = "justJimi2027";
+
+  if (keyInput.value.trim() === correctKey) {
+    overlay.classList.add("hidden");
+    document.body.style.overflow = "auto"; // allow scroll after fade-out
+    setTimeout(() => overlay.style.display = "none", 400); // remove after fade
+  } else {
+    errorMsg.style.display = "block";
+    keyInput.value = "";
+    keyInput.focus();
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const keyInput = document.getElementById("adminKey");
+  document.body.style.overflow = "hidden"; // lock scroll until login
+  keyInput.focus();
+  keyInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      checkAdminKey();
+    }
+  });
+});
+
+  
+  /*function checkAdminKey() {
   const keyInput = document.getElementById("adminKey");
   const errorMsg = document.getElementById("errorMsg");
   const overlay = document.getElementById("adminOverlay");
@@ -386,6 +414,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+  */
 </script>
 
   <script src="admin.js"></script>
