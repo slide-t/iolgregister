@@ -1050,7 +1050,31 @@ document.getElementById("darkModeSwitch").addEventListener("change", function ()
 });
 </script>
   
-  
+  <script>
+// REGISTER BUTTON BEHAVIOR
+document.getElementById("register-btn").addEventListener("click", function () {
+  const btn = document.getElementById("register-btn");
+  const spinner = document.getElementById("register-spinner");
+
+  btn.style.display = "none"; // hide the button text
+  spinner.classList.remove("hidden"); // show spinner
+});
+
+// PREVIEW BUTTON BEHAVIOR
+document.getElementById("preview-btn").addEventListener("click", function () {
+  const btn = document.getElementById("preview-btn");
+  const spinner = document.getElementById("preview-spinner");
+
+  btn.style.display = "none"; // hide the button text
+  spinner.classList.remove("hidden"); // show spinner
+
+  // simulate preview process, re-enable after some seconds
+  setTimeout(() => {
+    btn.style.display = "inline-block"; // show the button again
+    spinner.classList.add("hidden"); // hide spinner
+  }, 3000); // adjust preview time
+});
+</script>
 
 
 
