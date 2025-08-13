@@ -1,10 +1,11 @@
-const CACHE_NAME = "iolgregister-v6"; // Changed version
+const CACHE_NAME = "iolgregister-v9"; // Changed version
 const urlsToCache = [
   "/", 
   "/index.html",
   "/style.css",
   "/script.js",
 "/admin.html",
+  "/admin.css",
 "/main.css",
 "/main.js",
 "/admin.js",
