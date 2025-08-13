@@ -25,7 +25,7 @@
   100% { transform: rotate(360deg); }
 }
 </style>-->
-  
+  <!--
   <style>
   /* Common hidden utility */
 .hidden {
@@ -82,8 +82,58 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+  </style>-->
+  <style>
+    /* Hide helper */
+.hidden {
+  display: none !important;
+}
+
+/* Ensure buttons hold position for spinner */
+button {
+  position: relative;
+  min-width: 140px;
+  min-height: 40px;
+  overflow: hidden;
+}
+
+/* Common spinner style */
+.spinner,
+.spinner-preview {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  box-sizing: content-box;
+  animation: spin 1s linear infinite;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Register spinner — 4 colors */
+.spinner {
+  border: 4px solid transparent;
+  border-top: 4px solid red;
+  border-right: 4px solid green;
+  border-bottom: 4px solid blue;
+  border-left: 4px solid yellow;
+}
+
+/* Preview spinner — greyscale */
+.spinner-preview {
+  border: 4px solid transparent;
+  border-top: 4px solid grey;
+  border-right: 4px solid lightgrey;
+  border-bottom: 4px solid darkgrey;
+  border-left: 4px solid silver;
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
   </style>
-  
   
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>   
@@ -188,25 +238,35 @@
 <!-- Register Button -->
 <div class="form-group">
   <button type="submit" id="register-btn" class="primary">
-    Register <span id="register-spinner" class="spinner hidden"></span>
+    <span class="btn-text">Register</span>
+    <span id="register-spinner" class="spinner hidden"></span>
   </button>
 </div>
 
 <!-- Preview Button -->
 <div class="form-group">
   <button type="button" id="preview-btn" class="secondary">
-    Preview Registration <span id="preview-spinner" class="spinner-preview hidden"></span>
+    <span class="btn-text">Preview Registration</span>
+    <span id="preview-spinner" class="spinner-preview hidden"></span>
   </button>
 </div>
 
 
-
   
+<!-- Register Button --
+<div class="form-group">
+  <button type="submit" id="register-btn" class="primary">
+    Register <span id="register-spinner" class="spinner hidden"></span>
+  </button>
+</div>
 
-  
-
-  
-
+<!-- Preview Button --
+<div class="form-group">
+  <button type="button" id="preview-btn" class="secondary">
+    Preview Registration <span id="preview-spinner" class="spinner-preview hidden"></span>
+  </button>
+</div>
+-->
 
   <!-- Admin only field -->  
   <div class="form-group hidden" id="timestamp-group">  
@@ -1050,33 +1110,21 @@ document.getElementById("darkModeSwitch").addEventListener("change", function ()
 });
 </script>
 
-  <!--
+  
   <script>
-// REGISTER BUTTON BEHAVIOR
-document.getElementById("register-btn").addEventListener("click", function () {
-  const btn = document.getElementById("register-btn");
-  const spinner = document.getElementById("register-spinner");
-
-  btn.style.display = "none"; // hide the button text
-  spinner.classList.remove("hidden"); // show spinner
+// Register button click
+document.getElementById('register-btn').addEventListener('click', function () {
+  document.querySelector('#register-btn .btn-text').classList.add('hidden');
+  document.getElementById('register-spinner').classList.remove('hidden');
 });
 
-// PREVIEW BUTTON BEHAVIOR
-document.getElementById("preview-btn").addEventListener("click", function () {
-  const btn = document.getElementById("preview-btn");
-  const spinner = document.getElementById("preview-spinner");
-
-  btn.style.display = "none"; // hide the button text
-  spinner.classList.remove("hidden"); // show spinner
-
-  // simulate preview process, re-enable after some seconds
-  setTimeout(() => {
-    btn.style.display = "inline-block"; // show the button again
-    spinner.classList.add("hidden"); // hide spinner
-  }, 3000); // adjust preview time
-});
+// Preview button click
+document.getElementById('preview-btn').addEventListener('click', function () {
+  document.querySelector('#preview-btn .btn-text').classList.add('hidden');
+  document.getElementById('preview-spinner').classList.remove('hidden');
+});  
 </script>
--->
+
 
 
 </body>  
