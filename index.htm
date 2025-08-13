@@ -128,17 +128,16 @@
   <div class="form-group">  
     <button type="submit" id="register-btn">Register Member</button>  
   </div>  
-
-  <!-- Preview Button -->
+<!-- Preview Button -->
 <div class="form-group">  
   <button type="button" id="preview-btn" class="secondary">Preview Registration</button>  
 </div>
 
-
-<!-- Spinner -->
+<!-- Spinner for preview -->
 <div id="preview-spinner" style="display:none; text-align:center; margin-top:10px;">
-  <div class="spinner" style="border: 4px solid #ccc; border-top: 4px solid grey; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin:auto;"></div>
+  <div style="border: 4px solid #ccc; border-top: 4px solid #888; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin:auto;"></div>
 </div>
+  
 
 
   <!-- Admin only field -->  
@@ -471,6 +470,8 @@ const data = {
     el.classList.add("hidden");
   }   
 </script>
+
+  <!-- register button spinner css-->
   <style>
 /* 4-color spinner */
 .spinner {
@@ -569,6 +570,8 @@ biodataForm.addEventListener("submit", async function(e) {
   }
 });
 </script>
+
+  <!-- dark mode switch css-->
 <style>
 /* Base styling */
 body {
@@ -737,16 +740,8 @@ document.getElementById("darkModeSwitch").addEventListener("change", function ()
 });
 </script>
   
-  <!-- Preview Button --
-<div class="form-group">  
-  <button type="button" id="preview-btn" class="secondary">Preview Registration</button>  
-</div>
--->
-<!-- Spinner for preview -->
-<div id="preview-spinner" style="display:none; text-align:center; margin-top:10px;">
-  <div style="border: 4px solid #ccc; border-top: 4px solid #888; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin:auto;"></div>
-</div>
-
+  
+<!-- preview button css-->
 <style>
 @keyframes spin {
   0% { transform: rotate(0deg); }
