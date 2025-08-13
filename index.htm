@@ -27,7 +27,7 @@
 </style>-->
   
   <style>
- /* Common hidden utility */
+/* Common hidden utility */
 .hidden {
   display: none;
 }
@@ -35,16 +35,16 @@
 /* Base spinner style */
 .spinner,
 .spinner-preview {
-  border: 3px solid transparent;      /* Transparent sides */
-  border-radius: 50%;                  /* Perfect circle */
+  border: 3px solid transparent;
+  border-radius: 50%;
   width: 18px;
   height: 18px;
-  animation: spin 1s linear infinite;  /* Rotation */
-  margin-left: 6px;
+  animation: spin 1s linear infinite;
   vertical-align: middle;
+  display: inline-block;
 }
 
-/* Register spinner (multi-color) */
+/* Multi-color spinner for Register */
 .spinner {
   border-top: 3px solid red;
   border-right: 3px solid green;
@@ -52,7 +52,7 @@
   border-left: 3px solid yellow;
 }
 
-/* Preview spinner (grey shades) */
+/* Grey-tone spinner for Preview */
 .spinner-preview {
   border-top: 3px solid grey;
   border-right: 3px solid lightgrey;
@@ -66,8 +66,30 @@
   100% { transform: rotate(360deg); }
 }
 
+/* Button styling */
+button.primary,
+button.secondary {
+  position: relative;
+  min-width: 160px; /* Keeps width consistent when text hides */
+  min-height: 40px;
+  font-size: 14px;
+  cursor: pointer;
+}
 
-    
+/* Spinner centered inside button when active */
+button.loading {
+  color: transparent; /* Hide text */
+}
+
+button.loading .spinner,
+button.loading .spinner-preview {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: inline-block !important;
+}
+   
   </style>
   
   
