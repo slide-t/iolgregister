@@ -275,7 +275,7 @@ function debounce(fn, ms){ let t; return (...a) => { clearTimeout(t); t = setTim
 
 fetchData();
 </script>
-    -->
+    
   <style>
   /* Overlay for admin login */
   #adminOverlay {
@@ -345,26 +345,47 @@ fetchData();
     <button onclick="checkAdminKey()">Enter</button>
   </div>
 </div>
-
-
+-->
+    
+<div id="adminOverlay">
+  <div class="admin-card">
+    <h2>Admin Access</h2>
+    <div class="error-msg" id="errorMsg">Invalid Access Key</div>
+    <input type="password" id="adminKey" placeholder="Enter Access Key" />
+    <button onclick="checkAdminKey()">Enter</button>
+  </div>
+</div>
     
 <script>
-  function checkAdminKey(){
-    const keyInput = document.getElementById("adminKey");
-    const errorMsg = document.getElementById("errorMsg");
-    if(keyInput.value.trim() === "justJimi2027"){
-      document.getElementById("adminOverlay").style.display = "none";
-    } else {
-      errorMsg.style.display = "block";
-      keyInput.value = "";
-      keyInput.focus();
-    }
-  }
 
-  // Prevent access if overlay is active
-  document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("adminKey").focus();
+function checkAdminKey() {
+  const keyInput = document.getElementById("adminKey");
+  const errorMsg = document.getElementById("errorMsg");
+  const overlay = document.getElementById("adminOverlay");
+
+  // Admin password (could be moved to server-side check for better security)
+  const correctKey = "justJimi2027";
+
+  if (keyInput.value.trim() === correctKey) {
+    overlay.style.display = "none";
+    document.body.style.overflow = "auto"; // allow scrolling again
+  } else {
+    errorMsg.style.display = "block";
+    keyInput.value = "";
+    keyInput.focus();
+  }
+}
+
+// Enable pressing "Enter" to submit
+document.addEventListener("DOMContentLoaded", () => {
+  const keyInput = document.getElementById("adminKey");
+  keyInput.focus();
+  keyInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      checkAdminKey();
+    }
   });
+});
 </script>
 
   <script src="admin.js"></script>
