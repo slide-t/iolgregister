@@ -27,96 +27,37 @@
 </style>-->
   
   <style>
-/* Common hidden utility */
+ /* Common hidden utility */
 .hidden {
   display: none;
 }
 
-/* Register spinner */
-.spinner {
-  border: 4px solid transparent;
-  border-top: 4px solid red;
-  border-right: 4px solid green;
-  border-bottom: 4px solid blue;
-  border-left: 4px solid yellow;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  animation: spin 1s linear infinite;
-  margin-left: 6px;
-}
-
-/* Preview spinner (grey) */
+/* Base spinner style */
+.spinner,
 .spinner-preview {
-  border: 4px solid transparent;
-  border-top: 4px solid grey;
-  border-right: 4px solid lightgrey;
-  border-bottom: 4px solid darkgrey;
-  border-left: 4px solid silver;
-  border-radius: 50%;
+  border: 3px solid transparent;      /* Transparent sides */
+  border-radius: 50%;                  /* Perfect circle */
   width: 18px;
   height: 18px;
-  animation: spin 1s linear infinite;
+  animation: spin 1s linear infinite;  /* Rotation */
   margin-left: 6px;
-}
-
-/* Spin animation */
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-.preview-spinner {
-  border: 3px solid #ccc;
-  border-top: 3px solid #555;
-  border-radius: 50%;
-  width: 16px;
-  height: 16px;
-  display: inline-block;
-  animation: spin 1s linear infinite;
-  margin-left: 8px;
   vertical-align: middle;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-  
-    
-  </style>
-  <!--
-  <style>
-    /* Common hidden utility */
-.hidden {
-  display: none;
-}
-
-/* Register spinner */
+/* Register spinner (multi-color) */
 .spinner {
-  border: 4px solid transparent;
-  border-top: 4px solid red;
-  border-right: 4px solid green;
-  border-bottom: 4px solid blue;
-  border-left: 4px solid yellow;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  animation: spin 1s linear infinite;
-  margin-left: 6px;
+  border-top: 3px solid red;
+  border-right: 3px solid green;
+  border-bottom: 3px solid blue;
+  border-left: 3px solid yellow;
 }
 
-/* Preview spinner (grey) */
+/* Preview spinner (grey shades) */
 .spinner-preview {
-  border: 4px solid transparent;
-  border-top: 4px solid grey;
-  border-right: 4px solid lightgrey;
-  border-bottom: 4px solid darkgrey;
-  border-left: 4px solid silver;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  animation: spin 1s linear infinite;
-  margin-left: 6px;
+  border-top: 3px solid grey;
+  border-right: 3px solid lightgrey;
+  border-bottom: 3px solid darkgrey;
+  border-left: 3px solid silver;
 }
 
 /* Spin animation */
@@ -124,8 +65,13 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+
+    
   </style>
--->
+  
+  
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>  
 </head>  
