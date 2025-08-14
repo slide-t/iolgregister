@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Group Member Registration - Admin Dashboard</title>
+  <!--<link rel="stylesheet" href="style.css"/>-->
+  <style>
+    body { font-family: Arial, sans-serif; background:#f7f9fc; padding:20px; }
+    .container { max-width:1100px; margin:auto; background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+    h2 { color:#003049; margin-bottom:12px; }
+    .controls { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:12px; }
+    .controls .full { grid-column: 1 / -1; }
+    select, input[type="text"], button { padding:12px; border-radius:8px; border:1px solid #cfcfcf; font-size:15px; }
+    button { background:#003049; color:white; border:none; cursor:pointer; }
+    button.secondary { background:#f77f00; }
+    .flex { display:flex; gap:12px; }
+    .table-wrap { overflow:auto; max-height:420px; border:1px solid #eee; border-radius:8px; }
+    table { width:100%; border-collapse:collapse; }
+    th, td { text-align:left; padding:8px 10px; border-bottom:1px solid #f1f1f1; }
+    th { background:#f4f8fb; position:sticky; top:0; }
+    .wide-btn { padding:12px 20px; border-radius:8px; font-size:15px; }
+    .assign-panel { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:12px; align-items:center; }
+    .small { font-size:0.9rem; color:#555; }
+    .circle-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #003049;
+      color: white;
+      border: none;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .circle-btn:hover { background: #002233; }
+    @media (max-width:800px){
+      .controls { grid-template-columns:1fr; }
+      .assign-panel { grid-template-columns:1fr; }
+    }
+  </style>
+  <!-- jsPDF + autoTable -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h2>Admin Dashboard — Registrations</h2>
+    <div class="controls">
+      <select id="filterWard"><option value="">-- Filter by Ward --</option></select>
+      <select id="filterUnit"><option value="">-- Filter by Polling Unit --</option></select>
+      <input type="text" id="searchName" placeholder="Search by name..." />
+      <div class="full">
+        <div class="flex" style="align-items:center;">
+          <button id="previewPdfBtn" class="wide-btn secondary">Preview Filtered PDF</button>
+          <button id="refreshBtn" class="circle-btn" title="Refresh Data">&#x21bb;</button>
+        </div>
+      </div>
+    </div>
+
+  <div class="small">
+  Use the controls above to filter, search and preview registrations.  
+  Click a row's <em>Assign Code</em> to set or change the secure code for that member.
+</div>
+
+<div class="table-wrap" id="tableWrap">
+  <table id="membersTable">
+    <thead>
+      <tr>
+        <th>FullName</th>
+        <th>phoneNumber</th>
+        <th>address</th>
+        <th>ward</th>
+        <th>pollingUnit</th>
+        <th>vin</th>
+        <th>Secure Code</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<div class="assign-panel">
+  <input id="assignWard" placeholder="Assign general code to Ward" />
+  <input id="assignGeneralCode" placeholder="General secure code for ward" />
+  <button id="assignGeneralBtn">Assign to Ward</button>
+</div>
+
+<script>
+  const CODES_SHEET_URL = "https://sheetdb.io/api/v1/YOUR_CODES_SHEET_ID"; // replace with your codes sheet ID
+
+  document.getElementById("assignGeneralBtn").addEventListener("click", () => {
+    const ward = document.getElementById("assignWard").value.trim();
+    const code = document.getElementById("assignGeneralCode").value.trim();
+
+    if (!ward || !code) {
+      alert("Please enter both Ward and Code.");
+      return;
+    }
+
+    // First check if this ward already exists in codes sheet
+    fetch(`${CODES_SHEET_URL}/search?ward=${encodeURIComponent(ward)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.length > 0) {
+          // Ward exists → Update
+          fetch(`${CODES_SHEET_URL}/ward/${encodeURIComponent(ward)}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code: code })
+          })
+            .then(() => alert(`Code updated for ${ward}`))
+            .catch(err => console.error(err));
+        } else {
+          // Ward doesn't exist → Create new
+          fetch(CODES_SHEET_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify([{ ward: ward, code: code }])
+          })
+            .then(() => alert(`Code assigned to ${ward}`))
+            .catch(err => console.error(err));
+        }
+      });
+  });
+</script>
+    
+<script>
+
+
+// --- Configuration ---
+const SHEETDB_URL = 'https://sheetdb.io/api/v1/ji8u767etbjge';
+
+// Local mapping of secure codes
+function loadCodes(){
+  try { return JSON.parse(localStorage.getItem('secureCodes') || '{}'); } catch(e){ return {}; }
+}
+function saveCodes(obj){ localStorage.setItem('secureCodes', JSON.stringify(obj)); }
+
+let members = [];
+const wardSel = document.getElementById('filterWard');
+const unitSel = document.getElementById('filterUnit');
+const searchEl = document.getElementById('searchName');
+const tbody = document.querySelector('#membersTable tbody');
+
+async function fetchData(){
+  try {
+    const res = await fetch(SHEETDB_URL);
+    if(!res.ok) throw new Error('Failed to fetch');
+    const data = await res.json();
+    members = data.map(item => ({
+      FullName: item.FullName || item.fullname || '',
+      phoneNumber: item.phoneNumber || item.phone || '',
+      address: item.address || '',
+      ward: item.ward || '',
+      pollingUnit: item.pollingUnit || item.unit || '',
+      vin: item.vin || ''
+    }));
+    populateFilters();
+    renderTable();
+  } catch(err){ console.error(err); alert('Could not load registrations.'); }
+}
+
+function populateFilters(){
+  const wards = Array.from(new Set(members.map(m => m.ward).filter(Boolean))).sort();
+  const units = Array.from(new Set(members.map(m => m.pollingUnit).filter(Boolean))).sort();
+  wardSel.innerHTML = '<option value="">-- Filter by Ward --</option>' + wards.map(w => `<option value="${escapeHtml(w)}">${escapeHtml(w)}</option>`).join('');
+  unitSel.innerHTML = '<option value="">-- Filter by Polling Unit --</option>' + units.map(u => `<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`).join('');
+}
+
+function escapeHtml(str){ return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function renderTable(){
+  const codes = loadCodes();
+  const wardFilter = wardSel.value;
+  const unitFilter = unitSel.value;
+  const q = searchEl.value.trim().toLowerCase();
+  const filtered = members.filter(m => {
+    if(wardFilter && m.ward !== wardFilter) return false;
+    if(unitFilter && m.pollingUnit !== unitFilter) return false;
+    if(q && !m.FullName.toLowerCase().includes(q) && !m.phoneNumber.includes(q)) return false;
+    return true;
+  });
+  tbody.innerHTML = filtered.map(m => {
+    const keyGen = `${m.ward}::general`;
+    const keyInd = `${m.ward}::${m.FullName}`;
+    const code = codes[keyInd] || codes[keyGen] || '';
+    return `<tr>
+      <td>${escapeHtml(m.FullName)}</td>
+      <td>${escapeHtml(m.phoneNumber)}</td>
+      <td>${escapeHtml(m.address)}</td>
+      <td>${escapeHtml(m.ward)}</td>
+      <td>${escapeHtml(m.pollingUnit)}</td>
+      <td>${escapeHtml(m.vin)}</td>
+      <td>${escapeHtml(code)}</td>
+      <td><button class="assignBtn" data-name="${encodeURIComponent(m.FullName)}" data-ward="${encodeURIComponent(m.ward)}">Assign Code</button></td>
+    </tr>`;
+  }).join('');
+
+  document.querySelectorAll('.assignBtn').forEach(btn => btn.addEventListener('click', onAssignClick));
+}
+
+function onAssignClick(e){
+  const btn = e.currentTarget;
+  const name = decodeURIComponent(btn.dataset.name);
+  const ward = decodeURIComponent(btn.dataset.ward);
+  const codes = loadCodes();
+  const current = codes[`${ward}::${name}`] || codes[`${ward}::general`] || '';
+  const input = prompt(`Set secure code for ${name} (Ward: ${ward}). Leave empty to clear. Current: ${current}`, current);
+  if(input === null) return;
+  const key = `${ward}::${name}`;
+  if(input.trim() === ''){ delete codes[key]; }
+  else codes[key] = input.trim();
+  saveCodes(codes);
+  renderTable();
+}
+
+document.getElementById('assignGeneralBtn').addEventListener('click', () => {
+  const ward = wardSel.value;
+  const code = document.getElementById('assignGeneralCode').value.trim();
+  if(!ward){ alert('Select a ward in the filter above first.'); return; }
+  if(!code){ alert('Enter a code to assign.'); return; }
+  const codes = loadCodes();
+  codes[`${ward}::general`] = code;
+  saveCodes(codes);
+  document.getElementById('assignGeneralCode').value = '';
+  renderTable();
+  alert('General code assigned for ward: ' + ward);
+});
+
+wardSel.addEventListener('change', renderTable);
+unitSel.addEventListener('change', renderTable);
+searchEl.addEventListener('input', debounce(renderTable, 250));
+document.getElementById('refreshBtn').addEventListener('click', fetchData);
+
+document.getElementById('previewPdfBtn').addEventListener('click', () => {
+  const codes = loadCodes();
+  const wardFilter = wardSel.value;
+  const unitFilter = unitSel.value;
+  const q = searchEl.value.trim().toLowerCase();
+  const rows = members.filter(m => {
+    if(wardFilter && m.ward !== wardFilter) return false;
+    if(unitFilter && m.pollingUnit !== unitFilter) return false;
+    if(q && !m.FullName.toLowerCase().includes(q) && !m.phoneNumber.includes(q)) return false;
+    return true;
+  }).map(m => [m.FullName, m.phoneNumber, m.address, m.ward, m.pollingUnit, m.vin, (codes[`${m.ward}::${m.FullName}`] || codes[`${m.ward}::general`] || '')]);
+
+  if(rows.length === 0){ alert('No records to preview.'); return; }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+  const title = `Registrations${wardFilter ? ' - ' + wardFilter : ''}${unitFilter ? ' - ' + unitFilter : ''}`;
+  doc.setFontSize(14);
+  doc.text(title, 40, 40);
+
+  doc.autoTable({
+    startY: 60,
+    head: [[ 'FullName','Phone','Address','Ward','Polling Unit','VIN','Secure Code' ]],
+    body: rows,
+    styles: { fontSize: 9 }
+  });
+
+  const blob = doc.output('bloburl');
+  window.open(blob, '_blank');
+});
+
+function debounce(fn, ms){ let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+
+fetchData();
+</script>
+  <style>
+  /* Overlay for admin login */
+  #adminOverlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .admin-card {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    width: 320px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    animation: slideDown 0.4s ease;
+  }
+  @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  .admin-card h2 {
+    margin-bottom: 20px;
+    font-size: 20px;
+    color: #003049;
+  }
+  .admin-card input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    text-align: center;
+  }
+  .admin-card button {
+    width: 100%;
+    padding: 12px;
+    background: #003049;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .admin-card button:hover {
+    background: #002233;
+  }
+  .error-msg {
+    color: red;
+    font-size: 14px;
+    margin-bottom: 8px;
+    display: none;
+  }
+</style>
+
+<div id="adminOverlay">
+  <div class="admin-card">
+    <h2>Admin Access</h2>
+    <div class="error-msg" id="errorMsg">Invalid Access Key</div>
+    <input type="password" id="adminKey" placeholder="Enter Access Key" />
+    <button onclick="checkAdminKey()">Enter</button>
+  </div>
+</div>
+   
+<script>
+  function checkAdminKey(){
+    const keyInput = document.getElementById("adminKey");
+    const errorMsg = document.getElementById("errorMsg");
+    if(keyInput.value.trim() === "justJimi2027"){
+      document.getElementById("adminOverlay").style.display = "none";
+    } else {
+      errorMsg.style.display = "block";
+      keyInput.value = "";
+      keyInput.focus();
+    }
+  }
+
+  // Prevent access if overlay is active
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("adminKey").focus();
+  });
+</script>
+ 
+</body>
+</html>
