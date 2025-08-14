@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin Dashboard — Registrations</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- jsPDF + autotable -->
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+
+<style>
+  :root{
+    --bg:#f6f8fb;
+    --card:#ffffff;
+    --text:#0f172a;
+    --muted:#6b7280;
+    --primary:#0f3a56; /* your deep blue */
+    --primary-600:#0b2a3e;
+    --accent:#ff8c1a;  /* your orange button */
+    --danger:#dc3545;
+    --success:#22c55e;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    color:var(--text);
+    background:var(--bg);
+  }
+
+  .wrap{
+    max-width:1100px;
+    margin:0 auto;
+    padding:16px;
+  }
+
+  /* Sticky tools header */
+  .toolbar{
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:linear-gradient(to bottom, rgba(246,248,251,.98), rgba(246,248,251,.92));
+    backdrop-filter: blur(6px);
+    padding:12px;
+    margin:-12px -12px 16px;
+    border-bottom:1px solid #e5e7eb;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns: 1fr;
+    gap:16px;
+  }
+  @media(min-width:900px){
+    .grid{
+      grid-template-columns: 1.2fr .8fr;
+    }
+  }
+
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:0 10px 25px rgba(0,0,0,.06);
+    padding:16px;
+  }
+
+  .card h3{
+    margin:0 0 12px;
+    font-size:1.05rem;
+  }
+
+  .row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+
+  .input, select{
+    width:100%;
+    padding:12px 12px;
+    border:1px solid #e5e7eb;
+    border-radius:10px;
+    font-size:.95rem;
+    outline:none;
+    background:#fff;
+  }
+  .input:focus, select:focus{border-color:#cbd5e1; box-shadow:0 0 0 3px rgba(14,165,233,.12)}
+
+  .btn{
+    border:none;
+    border-radius:10px;
+    padding:12px 16px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .btn:disabled{opacity:.6; cursor:not-allowed}
+
+  .btn-accent{background:var(--accent); color:#fff}
+  .btn-primary{background:var(--primary); color:#fff}
+  .btn-primary:hover{background:var(--primary-600)}
+  .btn-danger{background:var(--danger); color:#fff}
+  .btn-ghost{background:#eef2f7; color:#0f3a56}
+
+  .badge{
+    display:inline-block;
+    padding:4px 8px;
+    border-radius:999px;
+    font-size:.78rem;
+    background:#eef2f7;
+    color:#0f3a56;
+  }
+
+  /* Table */
+  .table-wrap{
+    overflow:auto;
+    border-radius:12px;
+    border:1px solid #e5e7eb;
+    background:#fff;
+  }
+  table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0;
+    min-width:720px;
+  }
+  thead th{
+    position:sticky; top:0;
+    background:#f3f6fb;
+    color:#111827;
+    text-align:left;
+    padding:12px;
+    font-size:.9rem;
+    border-bottom:1px solid #e5e7eb;
+  }
+  tbody td{
+    padding:12px;
+    border-bottom:1px solid #f1f5f9;
+    vertical-align:middle;
+  }
+
+  /* Action buttons in table */
+  .table-actions{
+    display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;
+  }
+
+  /* Helper spacing */
+  .mt-8{margin-top:8px}
+  .mt-12{margin-top:12px}
+  .mt-16{margin-top:16px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- Sticky top actions -->
+  <div class="toolbar">
+    <div class="row">
+      <input id="searchName" class="input" placeholder="Search by name or phone…" />
+      <button id="previewPdfBtn" class="btn btn-accent">Preview Filtered PDF</button>
+      <button id="refreshBtn" class="btn btn-ghost" title="Refresh">&#x21bb;</button>
+    </div>
+    <div class="row mt-8">
+      <select id="filterWard">
+        <option value="">— Filter by Ward —</option>
+      </select>
+      <select id="filterUnit">
+        <option value="">— Filter by Polling Unit —</option>
+      </select>
+      <span class="badge">Use the controls to filter, search and preview registrations.</span>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <!-- Left: Members table -->
+    <div class="card">
+      <h3>Registrations</h3>
+      <div class="table-wrap">
+        <table id="membersTable">
+          <thead>
+            <tr>
+              <th>Full Name</th>
+              <th>Phone</th>
+              <th>Address</th>
+              <th>Ward</th>
+              <th>Polling Unit</th>
+              <th>VIN</th>
+              <th>Secure Code</th>
+              <th style="width:210px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+          <!-- filled by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Right: Assign / Revoke and Ward-wide code -->
+    <div class="card">
+      <h3>Assign / Revoke Controls</h3>
+
+      <div class="mt-8">
+        <label class="badge">Assign Secure Code to Selected User</label>
+        <div class="row mt-8">
+          <input id="assignFullname" class="input" placeholder="Fullname (auto-filled when you click a row button)" />
+        </div>
+        <div class="row mt-8">
+          <input id="assignWard" class="input" placeholder="Ward (auto-filled)" />
+        </div>
+        <div class="row mt-8">
+          <button id="assignUserBtn" class="btn btn-primary">Assign Code</button>
+          <button id="revokeUserBtn" class="btn btn-danger">Revoke Device</button>
+        </div>
+      </div>
+
+      <hr class="mt-16" />
+
+      <div class="mt-16">
+        <label class="badge">General Code for Ward (optional)</label>
+        <div class="row mt-8">
+          <input id="assignGeneralCode" class="input" placeholder="General secure code for ward" />
+        </div>
+        <div class="row mt-8">
+          <button id="assignGeneralBtn" class="btn btn-primary" title="Save general code for this ward">Assign to Ward</button>
+        </div>
+        <small class="mt-8" style="display:block;color:var(--muted);">
+          Note: General codes are stored in the Codes SheetDB (set the Ward first in the field above).
+        </small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===============================
+   CONFIG
+   =============================== */
+const SHEETDB_URL = 'https://sheetdb.io/api/v1/ji8u767etbjge'; // registrations DB
+const CODES_SHEET_URL = 'https://sheetdb.io/api/v1/YOUR_CODES_SHEET_ID'; // replace if you use ward general codes
+const SECURITY_SHEETDB_URL = 'https://sheetdb.io/api/v1/45mblkhz4vrjc'; // your security DB
+
+/* ===============================
+   STATE & ELEMENTS
+   =============================== */
+let members = [];
+let assignedRecords = []; // [{ fullname, secure_code, ward, device_id }]
+
+const wardSel = document.getElementById('filterWard');
+const unitSel = document.getElementById('filterUnit');
+const searchEl = document.getElementById('searchName');
+const tbody = document.querySelector('#membersTable tbody');
+
+const assignUserBtn = document.getElementById('assignUserBtn');
+const revokeUserBtn = document.getElementById('revokeUserBtn');
+const assignWardInput = document.getElementById('assignWard');
+const assignFullnameInput = document.getElementById('assignFullname');
+
+/* ===============================
+   HELPERS
+   =============================== */
+function escapeHtml(str){ return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function debounce(fn, ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; }
+function deviceId(){
+  // light-weight fingerprint: UA + lang + random stub saved to localStorage once
+  const k='__dev_id';
+  let id = localStorage.getItem(k);
+  if(!id){
+    id = 'DEV-'+Math.random().toString(36).slice(2,10).toUpperCase();
+    localStorage.setItem(k, id);
+  }
+  return id + '-' + navigator.language;
+}
+function generateSecureCode(){ return Math.random().toString(36).slice(2,10).toUpperCase(); }
+
+/* ===============================
+   API — SECURITY SHEETDB (assign/revoke)
+   =============================== */
+async function fetchSecurityAssignments(){
+  try{
+    const res = await fetch(SECURITY_SHEETDB_URL);
+    if(!res.ok) throw new Error('Failed to fetch security DB');
+    assignedRecords = await res.json();
+  }catch(e){
+    console.error(e);
+    assignedRecords = [];
+  }
+}
+function getAssignment(fullname, ward){
+  return assignedRecords.find(r => (r.fullname||'').trim()===fullname.trim() && (r.ward||'').trim()===ward.trim());
+}
+async function assignCode(fullname, ward){
+  const secure_code = generateSecureCode();
+  const dev_id = deviceId();
+
+  const payload = [{
+    fullname: fullname,
+    secure_code: secure_code,
+    ward: ward,
+    device_id: dev_id
+  }];
+
+  const res = await fetch(SECURITY_SHEETDB_URL, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  });
+  if(!res.ok) throw new Error('Assign failed');
+
+  await fetchSecurityAssignments();
+  renderTable();
+  toggleAssignRevoke(fullname, ward);
+  alert(`Assigned: ${fullname}\nWard: ${ward}\nCode: ${secure_code}`);
+}
+async function revokeByFullnameWard(fullname, ward){
+  // Delete all matching rows (fullname + ward)
+  const url = `${SECURITY_SHEETDB_URL}/search?fullname=${encodeURIComponent(fullname)}&ward=${encodeURIComponent(ward)}`;
+  const res = await fetch(url, { method:'DELETE' });
+  if(!res.ok) throw new Error('Revoke failed');
+
+  await fetchSecurityAssignments();
+  renderTable();
+  toggleAssignRevoke(fullname, ward);
+  alert(`Revoked access for ${fullname} (${ward})`);
+}
+
+/* ===============================
+   API — REGISTRATIONS DB
+   =============================== */
+async function fetchRegistrations(){
+  const res = await fetch(SHEETDB_URL);
+  if(!res.ok) throw new Error('Failed to fetch registrations');
+  const data = await res.json();
+  members = data.map(item => ({
+    FullName: item.FullName || item.fullname || '',
+    phoneNumber: item.phoneNumber || item.phone || '',
+    address: item.address || '',
+    ward: item.ward || '',
+    pollingUnit: item.pollingUnit || item.unit || '',
+    vin: item.vin || ''
+  }));
+}
+
+/* ===============================
+   UI — FILTERS & TABLE
+   =============================== */
+function populateFilters(){
+  const wards = Array.from(new Set(members.map(m => m.ward).filter(Boolean))).sort();
+  const units = Array.from(new Set(members.map(m => m.pollingUnit).filter(Boolean))).sort();
+
+  wardSel.innerHTML = '<option value="">— Filter by Ward —</option>' + wards.map(w=>`<option>${escapeHtml(w)}</option>`).join('');
+  unitSel.innerHTML = '<option value="">— Filter by Polling Unit —</option>' + units.map(u=>`<option>${escapeHtml(u)}</option>`).join('');
+}
+
+function renderTable(){
+  const q = (searchEl.value||'').toLowerCase().trim();
+  const wardFilter = wardSel.value;
+  const unitFilter = unitSel.value;
+
+  const filtered = members.filter(m=>{
+    if(wardFilter && m.ward !== wardFilter) return false;
+    if(unitFilter && m.pollingUnit !== unitFilter) return false;
+    if(q && !m.FullName.toLowerCase().includes(q) && !m.phoneNumber.includes(q)) return false;
+    return true;
+  });
+
+  tbody.innerHTML = filtered.map(m=>{
+    const assigned = getAssignment(m.FullName, m.ward);
+    const code = assigned ? (assigned.secure_code || '') : '';
+
+    const actionHtml = assigned
+      ? `<div class="table-actions">
+           <button class="btn btn-danger revokeBtn"
+             data-name="${encodeURIComponent(m.FullName)}"
+             data-ward="${encodeURIComponent(m.ward)}">Revoke</button>
+         </div>`
+      : `<div class="table-actions">
+           <button class="btn btn-primary assignBtn"
+             data-name="${encodeURIComponent(m.FullName)}"
+             data-ward="${encodeURIComponent(m.ward)}">Assign</button>
+         </div>`;
+
+    return `<tr>
+      <td>${escapeHtml(m.FullName)}</td>
+      <td>${escapeHtml(m.phoneNumber)}</td>
+      <td>${escapeHtml(m.address)}</td>
+      <td>${escapeHtml(m.ward)}</td>
+      <td>${escapeHtml(m.pollingUnit)}</td>
+      <td>${escapeHtml(m.vin)}</td>
+      <td>${escapeHtml(code)}</td>
+      <td>${actionHtml}</td>
+    </tr>`;
+  }).join('');
+
+  // bind buttons
+  document.querySelectorAll('.assignBtn').forEach(b=>{
+    b.addEventListener('click', async (e)=>{
+      const name = decodeURIComponent(e.currentTarget.dataset.name);
+      const ward = decodeURIComponent(e.currentTarget.dataset.ward);
+      assignFullnameInput.value = name;
+      assignWardInput.value = ward;
+
+      // guard: if already assigned, ignore
+      if(getAssignment(name, ward)){ alert('Already assigned for this user.'); return; }
+      try{
+        await assignCode(name, ward);
+      }catch(err){ console.error(err); alert('Failed to assign.'); }
+    });
+  });
+
+  document.querySelectorAll('.revokeBtn').forEach(b=>{
+    b.addEventListener('click', async (e)=>{
+      const name = decodeURIComponent(e.currentTarget.dataset.name);
+      const ward = decodeURIComponent(e.currentTarget.dataset.ward);
+      assignFullnameInput.value = name;
+      assignWardInput.value = ward;
+
+      if(!getAssignment(name, ward)){ alert('No assignment found for this user.'); return; }
+      if(!confirm(`Revoke access for ${name} (${ward})?`)) return;
+      try{
+        await revokeByFullnameWard(name, ward);
+      }catch(err){ console.error(err); alert('Failed to revoke.'); }
+    });
+  });
+
+  // update side-panel buttons if fields are set
+  toggleAssignRevoke(assignFullnameInput.value.trim(), assignWardInput.value.trim());
+}
+
+function toggleAssignRevoke(fullname, ward){
+  const has = fullname && ward && getAssignment(fullname, ward);
+  assignUserBtn.disabled = !!has;
+  revokeUserBtn.disabled = !has;
+}
+
+/* ===============================
+   SIDE PANEL BUTTONS
+   =============================== */
+assignUserBtn.addEventListener('click', async ()=>{
+  const name = assignFullnameInput.value.trim();
+  const ward = assignWardInput.value.trim();
+  if(!name || !ward){ alert('Enter Fullname and Ward. (Tip: click a row button to auto-fill)'); return; }
+  if(getAssignment(name, ward)){ alert('Already assigned.'); return; }
+  try{
+    await assignCode(name, ward);
+  }catch(err){ console.error(err); alert('Failed to assign.'); }
+});
+
+revokeUserBtn.addEventListener('click', async ()=>{
+  const name = assignFullnameInput.value.trim();
+  const ward = assignWardInput.value.trim();
+  if(!name || !ward){ alert('Enter Fullname and Ward to revoke.'); return; }
+  if(!getAssignment(name, ward)){ alert('No assignment found.'); return; }
+  if(!confirm(`Revoke access for ${name} (${ward})?`)) return;
+  try{
+    await revokeByFullnameWard(name, ward);
+  }catch(err){ console.error(err); alert('Failed to revoke.'); }
+});
+
+/* ===============================
+   WARD GENERAL CODE (optional)
+   =============================== */
+document.getElementById('assignGeneralBtn').addEventListener('click', async ()=>{
+  const ward = assignWardInput.value.trim();
+  const code = document.getElementById('assignGeneralCode').value.trim();
+  if(!ward || !code){ alert('Enter Ward and General Code.'); return; }
+
+  try{
+    // Does ward exist?
+    const check = await fetch(`${CODES_SHEET_URL}/search?ward=${encodeURIComponent(ward)}`).then(r=>r.json());
+    if(Array.isArray(check) && check.length){
+      await fetch(`${CODES_SHEET_URL}/ward/${encodeURIComponent(ward)}`,{
+        method:'PATCH',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ code })
+      });
+      alert(`General code updated for ${ward}`);
+    }else{
+      await fetch(CODES_SHEET_URL,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify([{ ward, code }])
+      });
+      alert(`General code saved for ${ward}`);
+    }
+    document.getElementById('assignGeneralCode').value='';
+  }catch(e){
+    console.error(e);
+    alert('Failed to save general code.');
+  }
+});
+
+/* ===============================
+   PDF PREVIEW
+   =============================== */
+document.getElementById('previewPdfBtn').addEventListener('click', ()=>{
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'pt', format:'a4' });
+
+  const q = (searchEl.value||'').toLowerCase().trim();
+  const wardFilter = wardSel.value;
+  const unitFilter = unitSel.value;
+
+  const rows = members.filter(m=>{
+    if(wardFilter && m.ward !== wardFilter) return false;
+    if(unitFilter && m.pollingUnit !== unitFilter) return false;
+    if(q && !m.FullName.toLowerCase().includes(q) && !m.phoneNumber.includes(q)) return false;
+    return true;
+  }).map(m=>{
+    const a = getAssignment(m.FullName, m.ward);
+    return [m.FullName, m.phoneNumber, m.address, m.ward, m.pollingUnit, m.vin, a ? (a.secure_code||'') : ''];
+  });
+
+  if(!rows.length){ alert('No records to preview.'); return; }
+
+  doc.setFontSize(14);
+  const title = `Registrations${wardFilter?` — ${wardFilter}`:''}${unitFilter?` — ${unitFilter}`:''}`;
+  doc.text(title, 40, 40);
+
+  doc.autoTable({
+    startY: 60,
+    head: [['FullName','Phone','Address','Ward','Polling Unit','VIN','Secure Code']],
+    body: rows,
+    styles: { fontSize: 9 }
+  });
+
+  window.open(doc.output('bloburl'), '_blank');
+});
+
+/* ===============================
+   EVENTS & INITIAL LOAD
+   =============================== */
+wardSel.addEventListener('change', ()=>{ renderTable(); toggleAssignRevoke(assignFullnameInput.value.trim(), assignWardInput.value.trim()); });
+unitSel.addEventListener('change', renderTable);
+searchEl.addEventListener('input', debounce(renderTable, 250));
+document.getElementById('refreshBtn').addEventListener('click', async ()=>{
+  await Promise.all([fetchRegistrations(), fetchSecurityAssignments()]);
+  populateFilters();
+  renderTable();
+});
+
+(async function init(){
+  try{
+    await Promise.all([fetchRegistrations(), fetchSecurityAssignments()]);
+    populateFilters();
+    renderTable();
+  }catch(e){
+    console.error(e);
+    alert('Failed to load data.');
+  }
+})();
+</script>
+</body>
+</html>
