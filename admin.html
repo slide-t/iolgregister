@@ -76,7 +76,45 @@ th { background:#f4f8fb; position:sticky; top:0; }
   animation: fadeIn 0.3s ease-in-out;
 }*/
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.admin-card {
+  background: #fff;
+  padding: 40px; /* increased padding */
+  border-radius: 12px;
+  text-align: center;
+  width: 400px; /* wider card */
+  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+  animation: slideDown 0.4s ease;
+  transform: scale(1.05); /* slight scale for a larger look */
+}
 
+.admin-card h2 {
+  margin-bottom: 25px;
+  font-size: 24px; /* bigger heading */
+  color: #003049;
+}
+
+.admin-card input {
+  width: 100%;
+  padding: 15px; /* bigger input */
+  margin-bottom: 20px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 17px; /* larger text */
+  text-align: center;
+}
+
+.admin-card button {
+  width: 100%;
+  padding: 15px;
+  background: #003049;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 18px; /* larger button text */
+  cursor: pointer;
+}
+  
+  /*
 .admin-card {
   background: #fff;
   padding: 30px;
@@ -111,7 +149,7 @@ th { background:#f4f8fb; position:sticky; top:0; }
   border-radius: 8px;
   font-size: 16px;
   cursor: pointer;
-}
+}*/
 .admin-card button:hover {
   background: #002233;
 }
