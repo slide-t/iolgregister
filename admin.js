@@ -2,22 +2,103 @@
 // CONFIGURATION
 // ===============================
 const SHEETDB_URL = 'https://sheetdb.io/api/v1/ji8u767etbjge';
-const CODES_SHEET_URL = "https://sheetdb.io/api/v1/YOUR_CODES_SHEET_ID"; // Replace with your codes sheet ID
+const CODES_SHEET_URL = "https://sheetdb.io/api/v1/45mblkhz4vrjc"; // Replace with your codes sheet ID
 
 // ===============================
 // LOCAL STORAGE FOR CODES
 // ===============================
-function loadCodes() {
-  try {
-    return JSON.parse(localStorage.getItem('secureCodes') || '{}');
-  } catch (e) {
-    return {};
-  }
-}
-function saveCodes(obj) {
-  localStorage.setItem('secureCodes', JSON.stringify(obj));
+
+// UI Elements
+const assignBtn = document.getElementById("assignGeneralBtn");
+const revokeBtn = document.getElementById("revokeBtn");
+const wardInput = document.getElementById("assignWard");
+const fullnameInput = document.getElementById("assignFullname"); // Add fullname input in HTML
+
+// Check if ward already assigned
+function checkAssignmentStatus(ward) {
+  if (!ward) return;
+  fetch(`${SECURITY_SHEETDB_URL}/search?ward=${encodeURIComponent(ward)}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.length > 0) {
+        assignBtn.disabled = true;
+        revokeBtn.disabled = false;
+      } else {
+        assignBtn.disabled = false;
+        revokeBtn.disabled = true;
+      }
+    })
+    .catch(err => console.error(err));
 }
 
+// Assign user
+assignBtn.addEventListener("click", () => {
+  const ward = wardInput.value.trim();
+  const fullname = fullnameInput.value.trim();
+  const device_id = navigator.userAgent; // Or custom device ID
+  const secure_code = Math.random().toString(36).substring(2, 8).toUpperCase();
+
+  if (!ward || !fullname) {
+    alert("Please enter both Ward and Fullname.");
+    return;
+  }
+
+  fetch(`${SECURITY_SHEETDB_URL}/search?ward=${encodeURIComponent(ward)}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.length > 0) {
+        alert("This ward already has an assigned user.");
+      } else {
+        fetch(SECURITY_SHEETDB_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify([{
+            fullname,
+            secure_code,
+            ward,
+            device_id
+          }])
+        })
+          .then(() => {
+            alert(`Code assigned to ${ward}`);
+            checkAssignmentStatus(ward);
+          })
+          .catch(err => console.error(err));
+      }
+    });
+});
+
+// Revoke user
+revokeBtn.addEventListener("click", () => {
+  const ward = wardInput.value.trim();
+  if (!ward) {
+    alert("Enter the ward to revoke.");
+    return;
+  }
+
+  fetch(`${SECURITY_SHEETDB_URL}/search?ward=${encodeURIComponent(ward)}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.length === 0) {
+        alert("No assigned user found for this ward.");
+      } else {
+        const secure_code = data[0].secure_code;
+        fetch(`${SECURITY_SHEETDB_URL}/secure_code/${encodeURIComponent(secure_code)}`, {
+          method: "DELETE"
+        })
+          .then(() => {
+            alert(`User revoked for ward ${ward}`);
+            checkAssignmentStatus(ward);
+          })
+          .catch(err => console.error(err));
+      }
+    });
+});
+
+// Auto-check on ward input change
+wardInput.addEventListener("change", () => {
+  checkAssignmentStatus(wardInput.value.trim());
+});
 // ===============================
 // GLOBAL VARIABLES
 // ===============================
