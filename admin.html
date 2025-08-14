@@ -241,24 +241,7 @@ input:checked + .slider:before { transform: translateX(26px); }
 .slider.round:before { border-radius: 50%; }
 </style>
 
-<script>
-(function(){
-  const toggle = document.getElementById('darkModeToggle');
-  if (localStorage.getItem('theme') === 'dark') {
-    document.body.classList.add('dark-mode');
-    toggle.checked = true;
-  }
-  toggle.addEventListener('change', () => {
-    if (toggle.checked) {
-      document.body.classList.add('dark-mode');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.body.classList.remove('dark-mode');
-      localStorage.setItem('theme', 'light');
-    }
-  });
-})();
-</script>
+
 
 
 
@@ -624,6 +607,25 @@ fetchData();
     document.getElementById("adminKey").focus();
   });
 </script>
+ <script>
+   (function(){
+  const toggle = document.getElementById('darkModeToggle');
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark-mode');
+    toggle.checked = true;
+  }
+  toggle.addEventListener('change', () => {
+    if (toggle.checked) {
+      document.body.classList.add('dark-mode');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.body.classList.remove('dark-mode');
+      localStorage.setItem('theme', 'light');
+    }
+  });
+})();
+</script>
+
  
 </body>
 </html>
