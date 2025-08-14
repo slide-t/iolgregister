@@ -5,6 +5,211 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Group Member Registration - Admin Dashboard</title>
   <!--<link rel="stylesheet" href="style.css"/>-->
+  <!-- Dark Mode Toggle -->
+<label class="switch">
+  <input type="checkbox" id="darkModeToggle">
+  <span class="slider round"></span>
+</label>
+
+<style>
+/* Your original CSS — unchanged */
+body { font-family: Arial, sans-serif; background:#f7f9fc; padding:20px; }
+.container { max-width:1100px; margin:auto; background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+h2 { color:#003049; margin-bottom:12px; }
+.controls { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:12px; }
+.controls .full { grid-column: 1 / -1; }
+select, input[type="text"], button { padding:12px; border-radius:8px; border:1px solid #cfcfcf; font-size:15px; }
+button { background:#003049; color:white; border:none; cursor:pointer; }
+button.secondary { background:#f77f00; }
+.flex { display:flex; gap:12px; }
+.table-wrap { overflow:auto; max-height:420px; border:1px solid #eee; border-radius:8px; }
+table { width:100%; border-collapse:collapse; }
+th, td { text-align:left; padding:8px 10px; border-bottom:1px solid #f1f1f1; }
+th { background:#f4f8fb; position:sticky; top:0; }
+.wide-btn { padding:12px 20px; border-radius:8px; font-size:15px; }
+.assign-panel { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:12px; align-items:center; }
+.small { font-size:0.9rem; color:#555; }
+.circle-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #003049;
+  color: white;
+  border: none;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.circle-btn:hover { background: #002233; }
+@media (max-width:800px){
+  .controls { grid-template-columns:1fr; }
+  .assign-panel { grid-template-columns:1fr; }
+}
+
+/* Overlay for admin login */
+#adminOverlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease-in-out;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.admin-card {
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  width: 320px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  animation: slideDown 0.4s ease;
+}
+@keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.admin-card h2 {
+  margin-bottom: 20px;
+  font-size: 20px;
+  color: #003049;
+}
+.admin-card input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  text-align: center;
+}
+.admin-card button {
+  width: 100%;
+  padding: 12px;
+  background: #003049;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+.admin-card button:hover {
+  background: #002233;
+}
+.error-msg {
+  color: red;
+  font-size: 14px;
+  margin-bottom: 8px;
+  display: none;
+}
+
+/* DARK MODE STYLES */
+body.dark-mode {
+  background: #121212;
+  color: #eaeaea;
+}
+body.dark-mode .container {
+  background: #1e1e1e;
+  box-shadow: 0 2px 8px rgba(255,255,255,0.05);
+}
+body.dark-mode h2 { color: #f1f1f1; }
+body.dark-mode select,
+body.dark-mode input[type="text"],
+body.dark-mode button {
+  background: #2a2a2a;
+  color: #f1f1f1;
+  border: 1px solid #444;
+}
+body.dark-mode th {
+  background: #2d2d2d;
+  color: #f1f1f1;
+}
+body.dark-mode td {
+  border-bottom: 1px solid #333;
+}
+body.dark-mode .circle-btn {
+  background: #555;
+}
+body.dark-mode .circle-btn:hover {
+  background: #777;
+}
+body.dark-mode .admin-card {
+  background: #1e1e1e;
+  color: #eaeaea;
+}
+body.dark-mode .admin-card input {
+  background: #2a2a2a;
+  color: #f1f1f1;
+  border: 1px solid #444;
+}
+body.dark-mode .admin-card button {
+  background: #555;
+  color: #fff;
+}
+body.dark-mode .admin-card button:hover {
+  background: #777;
+}
+
+/* DARK MODE TOGGLE SWITCH */
+.switch {
+  position: fixed;
+  top: 50%;
+  left: 20px;
+  transform: translateY(-50%);
+  width: 60px;
+  height: 34px;
+  z-index: 10000;
+}
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 34px;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px; width: 26px;
+  left: 4px; bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+input:checked + .slider { background-color: #2196F3; }
+input:checked + .slider:before { transform: translateX(26px); }
+.slider.round { border-radius: 34px; }
+.slider.round:before { border-radius: 50%; }
+</style>
+
+<script>
+(function(){
+  const toggle = document.getElementById('darkModeToggle');
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark-mode');
+    toggle.checked = true;
+  }
+  toggle.addEventListener('change', () => {
+    if (toggle.checked) {
+      document.body.classList.add('dark-mode');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.body.classList.remove('dark-mode');
+      localStorage.setItem('theme', 'light');
+    }
+  });
+})();
+</script>
+
+
+
+  <!--
   <style>
     body { font-family: Arial, sans-serif; background:#f7f9fc; padding:20px; }
     .container { max-width:1100px; margin:auto; background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
