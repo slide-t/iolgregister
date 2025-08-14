@@ -92,7 +92,57 @@
   border-radius: 5px;
   cursor: pointer;
 }
+.assign-spinner {
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid white;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    animation: assign-spin 0.8s linear infinite;
+    display: inline-block;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  @keyframes assign-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+.revoke-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
 
+.revoke-panel input {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+#revokeDeviceBtn {
+  background-color: #e74c3c; /* red for revoke */
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#revokeDeviceBtn:hover {
+  background-color: #c0392b;
+}
+
+#revokeDeviceBtn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+  
 
   
   
