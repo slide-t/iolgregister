@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Admin Dashboard — Registrations</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- jsPDF + autotable -->
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+
+<style>
+  :root{
+    --bg:#0b1220;
+    --card:#0f172a;
+    --card-2:#111a2e;
+    --text:#e5e7eb;
+    --muted:#94a3b8;
+    --primary:#0ea5e9;
+    --primary-600:#0284c7;
+    --accent:#f59e0b;
+    --danger:#ef4444;
+    --success:#22c55e;
+    --border:#162036;
+    --radius:14px;
+    --shadow: 0 12px 30px rgba(0,0,0,.45);
+  }
+  [data-theme="light"]{
+    --bg:#f6f8fb;
+    --card:#ffffff;
+    --card-2:#ffffff;
+    --text:#0f172a;
+    --muted:#6b7280;
+    --primary:#0f3a56;
+    --primary-600:#0b2a3e;
+    --accent:#ff8c1a;
+    --danger:#dc3545;
+    --success:#16a34a;
+    --border:#e6eef6;
+    --shadow: 0 10px 25px rgba(0,0,0,.06);
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    color:var(--text);
+    background:var(--bg);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+
+  /* App container centered */
+  .app {
+    width:100%;
+    max-width:1100px;
+    margin:0 auto;
+  }
+
+  /* Toolbar */
+  .toolbar {
+    position:sticky;
+    top:0;
+    z-index:30;
+    padding:12px;
+    margin-bottom:16px;
+    display:flex;
+    gap:12px;
+    align-items:center;
+    background: linear-gradient(180deg, rgba(0,0,0,0.22), rgba(0,0,0,0.08));
+    border-radius:12px;
+    border:1px solid var(--border);
+    backdrop-filter: blur(6px);
+  }
+  .toolbar .left { display:flex; gap:8px; flex:1; align-items:center; }
+  .toolbar .right { display:flex; gap:8px; align-items:center; }
+
+  .search {
+    flex:1;
+    min-width:220px;
+  }
+  .input, select {
+    width:100%;
+    padding:10px 12px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:var(--card-2);
+    color:var(--text);
+    font-size:0.95rem;
+    outline:none;
+  }
+  .input::placeholder { color:var(--muted); }
+
+  .btn {
+    padding:10px 12px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:var(--card-2);
+    color:var(--text);
+    font-weight:600;
+    cursor:pointer;
+    display:inline-flex;
+    gap:8px;
+    align-items:center;
+  }
+  .btn:disabled{ opacity:.6; cursor:not-allowed; }
+  .btn.primary{ background:var(--primary); color:#fff; border-color:transparent; }
+  .btn.danger{ background:var(--danger); color:#fff; border-color:transparent; }
+  .btn.ghost{ background:transparent; }
+  .btn.accent{ background:var(--accent); color:#111; border-color:transparent; }
+
+  .toolbar .chip { padding:6px 10px; border-radius:999px; background:transparent; color:var(--muted); font-size:0.85rem; }
+
+  /* layout grid */
+  .grid {
+    display:grid;
+    grid-template-columns: 1fr;
+    gap:16px;
+  }
+  @media(min-width:980px){
+    .grid { grid-template-columns: 1.25fr .75fr; }
+  }
+
+  .card {
+    background:var(--card);
+    border-radius:var(--radius);
+    padding:16px;
+    border:1px solid var(--border);
+    box-shadow:var(--shadow);
+  }
+  .card h3 { margin:0 0 12px; font-size:1.05rem; }
+
+  /* table */
+  .table-wrap {
+    overflow:auto;
+    border-radius:12px;
+    border:1px solid var(--border);
+    background:var(--card-2);
+  }
+  table { width:100%; border-collapse:separate; border-spacing:0; min-width:820px; }
+  thead th {
+    position:sticky; top:0;
+    background:var(--card-2); color:var(--text);
+    padding:12px; text-align:left; font-size:0.9rem; border-bottom:1px solid var(--border);
+  }
+  tbody td { padding:12px; border-bottom:1px solid var(--border); vertical-align:middle; color:var(--text); font-size:0.95rem; }
+  .table-actions { display:flex; gap:8px; justify-content:flex-end; }
+
+  /* side controls */
+  .controls .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .controls .row > * { flex:1 1 auto; min-width:0; }
+
+  .small { font-size:0.85rem; color:var(--muted); }
+
+  /* settings menu */
+  .settings { position:relative; }
+  .settings-btn { width:42px; height:42px; border-radius:10px; display:grid; place-items:center; cursor:pointer; border:1px solid var(--border); background:var(--card-2); color:var(--text); }
+  .settings-menu {
+    position:absolute; right:0; top:50px; width:200px; background:var(--card); border:1px solid var(--border);
+    border-radius:10px; box-shadow:var(--shadow); padding:8px; display:none; transform-origin:top right;
+  }
+  .settings-menu.open { display:block; animation: pop .18s ease-out; }
+  @keyframes pop { from { transform: scale(.97) translateY(-6px); opacity:0 } to { transform:scale(1) translateY(0); opacity:1 } }
+  .settings-menu button { width:100%; text-align:left; padding:8px 10px; border-radius:8px; background:transparent; border:none; color:var(--text); cursor:pointer; }
+
+  /* login overlay / water background */
+  #adminOverlay {
+    position:fixed; inset:0; z-index:9999;
+    display:flex; align-items:center; justify-content:center;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,0.48), rgba(0,0,0,0.6)),
+      url('https://images.unsplash.com/photo-1506157786151-b8491531f063?q=80&w=1960&auto=format&fit=crop') center/cover no-repeat;
+    backdrop-filter: blur(2px) saturate(120%);
+  }
+  .login-card {
+    width:min(92vw,380px);
+    background: rgba(255,255,255,0.04);
+    border-radius:14px;
+    padding:22px;
+    border:1px solid rgba(255,255,255,0.06);
+    text-align:center;
+    box-shadow: var(--shadow);
+  }
+  .login-card h2 { margin:0 0 10px; color:var(--text); }
+  .login-card input { width:100%; padding:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.06); background:transparent; color:var(--text); margin-bottom:12px; }
+  .login-card .login-btn { width:100%; padding:12px; border-radius:10px; border:none; background:var(--primary); color:#fff; font-weight:700; cursor:pointer; }
+
+  .error { color: #ff8b8b; font-size:0.9rem; display:none; margin-top:8px; }
+
+  /* small-screen tweaks */
+  @media(max-width:760px){
+    .toolbar { flex-direction:column; align-items:stretch; gap:8px; }
+    .toolbar .right { margin-left:0; justify-content:flex-end; }
+    table { min-width:640px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN OVERLAY -->
+<div id="adminOverlay" aria-hidden="false">
+  <div class="login-card" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <h2 id="loginTitle">Admin Login</h2>
+    <input id="adminPass" type="password" placeholder="Enter Access Code" autocomplete="current-password" />
+    <button id="loginBtn" class="login-btn">Enter Dashboard</button>
+    <div id="loginError" class="error">Invalid access code</div>
+    <div style="margin-top:10px;font-size:0.86rem;color:var(--muted)">Access code is case-sensitive</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" role="application" aria-label="Admin dashboard">
+  <!-- toolbar -->
+  <div class="toolbar" role="region" aria-label="Controls">
+    <div class="left">
+      <div class="search" style="min-width:180px;">
+        <input id="searchName" class="input" placeholder="Search by name or phone…" />
+      </div>
+
+      <div style="width:220px;">
+        <select id="filterWard" class="input">
+          <option value="">— Filter by Ward —</option>
+        </select>
+      </div>
+
+      <div style="width:220px;">
+        <select id="filterUnit" class="input">
+          <option value="">— Filter by Polling Unit —</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="chip small" id="lastUpdated">Last updated: —</div>
+      <button id="previewPdfBtn" class="btn accent" title="Preview filtered PDF">Preview PDF</button>
+      <button id="printPdfBtn" class="btn" title="Print filtered PDF">🖨 Print</button>
+      <button id="refreshBtn" class="btn ghost" title="Refresh data">⟳ Refresh</button>
+
+      <div class="settings">
+        <button id="settingsBtn" class="settings-btn" title="Settings">⚙️</button>
+        <div id="settingsMenu" class="settings-menu" role="menu" aria-hidden="true">
+          <button data-theme-select="dark" class="small">🌙 Dark mode</button>
+          <button data-theme-select="light" class="small">☀️ Light mode</button>
+          <button data-theme-select="system" class="small">🖥 System</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- main grid -->
+  <div class="grid">
+    <!-- left: table -->
+    <div class="card" aria-labelledby="registrationsTitle">
+      <h3 id="registrationsTitle">Registrations</h3>
+      <div class="table-wrap" role="region" aria-label="Registrations table">
+        <table id="membersTable" aria-describedby="registrationsTitle">
+          <thead>
+            <tr>
+              <th>Full Name</th>
+              <th>Phone</th>
+              <th>Address</th>
+              <th>Ward</th>
+              <th>Polling Unit</th>
+              <th>VIN</th>
+              <th>Secure Code</th>
+              <th style="width:190px">Actions</th>
+            </tr>
+          </thead>
+          <tbody><!-- filled by JS --></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- right: controls -->
+    <div class="card controls" aria-labelledby="controlsTitle">
+      <h3 id="controlsTitle">Assign / Revoke Controls</h3>
+
+      <div class="row mt-8">
+        <input id="assignFullname" class="input" placeholder="Fullname (click row to auto-fill)" />
+      </div>
+
+      <div class="row mt-8">
+        <input id="assignWard" class="input" placeholder="Ward (auto-filled)" />
+      </div>
+
+      <div class="row mt-8">
+        <button id="assignUserBtn" class="btn primary">Assign Code</button>
+        <button id="revokeUserBtn" class="btn danger">Revoke Device</button>
+      </div>
+
+      <hr style="margin:16px 0; border:none; border-top:1px solid var(--border)">
+
+      <div>
+        <div class="small">General Code for Ward (optional)</div>
+        <div class="row mt-8">
+          <input id="assignGeneralCode" class="input" placeholder="General secure code for ward" />
+        </div>
+        <div class="row mt-8">
+          <button id="assignGeneralBtn" class="btn primary">Assign to Ward</button>
+        </div>
+        <div style="margin-top:10px" class="small">General codes are optional and saved to the Codes SheetDB (if set).</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================
+   CONFIG
+   ============================ */
+const SHEETDB_URL = 'https://sheetdb.io/api/v1/ji8u767etbjge'; // registrations DB
+const CODES_SHEET_URL = 'https://sheetdb.io/api/v1/YOUR_CODES_SHEET_ID'; // optional
+const SECURITY_SHEETDB_URL = 'https://sheetdb.io/api/v1/45mblkhz4vrjc'; // your security DB
+const AUTO_REFRESH_MS = 10000;
+const ADMIN_PASSWORD = 'justJimi2027';
+
+/* ============================
+   STATE & ELEMENTS
+   ============================ */
+let members = [];
+let assignedRecords = []; // [{ fullname, secure_code, ward, device_id }]
+let refreshTimer = null;
+
+const overlay = document.getElementById('adminOverlay');
+const passInput = document.getElementById('adminPass');
+const loginBtn = document.getElementById('loginBtn');
+const loginError = document.getElementById('loginError');
+
+const wardSel = document.getElementById('filterWard');
+const unitSel = document.getElementById('filterUnit');
+const searchEl = document.getElementById('searchName');
+const tbody = document.querySelector('#membersTable tbody');
+
+const assignUserBtn = document.getElementById('assignUserBtn');
+const revokeUserBtn = document.getElementById('revokeUserBtn');
+const assignWardInput = document.getElementById('assignWard');
+const assignFullnameInput = document.getElementById('assignFullname');
+
+const previewPdfBtn = document.getElementById('previewPdfBtn');
+const printPdfBtn = document.getElementById('printPdfBtn');
+const refreshBtn = document.getElementById('refreshBtn');
+const lastUpdatedEl = document.getElementById('lastUpdated');
+
+const settingsBtn = document.getElementById('settingsBtn');
+const settingsMenu = document.getElementById('settingsMenu');
+
+/* ============================
+   LOGIN HANDLING
+   ============================ */
+function showOverlay(){ overlay.style.display='flex'; overlay.setAttribute('aria-hidden','false'); }
+function hideOverlay(){ overlay.style.display='none'; overlay.setAttribute('aria-hidden','true'); }
+function grantAccess(){
+  sessionStorage.setItem('admin_authed','1');
+  hideOverlay();
+}
+function denyAccess(){
+  loginError.style.display='block';
+  passInput.focus();
+}
+function tryLogin(){
+  loginError.style.display='none';
+  if(passInput.value === ADMIN_PASSWORD){
+    grantAccess();
+  } else {
+    denyAccess();
+  }
+}
+loginBtn.addEventListener('click', tryLogin);
+passInput.addEventListener('keyup', (e)=>{ if(e.key==='Enter') tryLogin(); });
+
+// If session has auth flag, hide overlay:
+if(sessionStorage.getItem('admin_authed')==='1'){ hideOverlay(); } else { showOverlay(); }
+
+/* ============================
+   THEME HANDLING
+   ============================ */
+const THEME_KEY = 'admin_theme_choice';
+function applyTheme(choice){
+  if(choice === 'system'){
+    const sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', sysDark ? 'dark' : 'light');
+  } else {
+    document.documentElement.setAttribute('data-theme', choice);
+  }
+}
+function setTheme(choice){
+  localStorage.setItem(THEME_KEY, choice);
+  applyTheme(choice);
+}
+function initTheme(){
+  const saved = localStorage.getItem(THEME_KEY) || 'dark';
+  applyTheme(saved);
+}
+settingsBtn.addEventListener('click', ()=> {
+  settingsMenu.classList.toggle('open');
+  settingsMenu.setAttribute('aria-hidden', settingsMenu.classList.contains('open') ? 'false' : 'true');
+});
+document.addEventListener('click', (e)=>{
+  if(!settingsMenu.contains(e.target) && !settingsBtn.contains(e.target)){
+    settingsMenu.classList.remove('open');
+    settingsMenu.setAttribute('aria-hidden','true');
+  }
+});
+document.querySelectorAll('[data-theme-select]').forEach(btn=>{
+  btn.addEventListener('click', (e)=> setTheme(e.currentTarget.dataset.themeSelect));
+});
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ()=>{
+  const saved = localStorage.getItem(THEME_KEY) || 'dark';
+  if(saved === 'system') applyTheme('system');
+});
+initTheme();
+
+/* ============================
+   MOBILE KEYBOARD FLOAT SEARCH
+   ============================ */
+function enableKeyboardFloat(){
+  const onFocus = () => { document.body.classList.add('kb-focus'); /* keep toolbar floating */ };
+  const onBlur = () => { document.body.classList.remove('kb-focus'); };
+  searchEl.addEventListener('focus', onFocus);
+  searchEl.addEventListener('blur', onBlur);
+}
+enableKeyboardFloat();
+
+/* ============================
+   HELPERS
+   ============================ */
+function escapeHtml(str){ return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function debounce(fn, ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; }
+function deviceId(){
+  const key = '__dev_id_v1';
+  let id = localStorage.getItem(key);
+  if(!id){
+    id = 'DEV-'+Math.random().toString(36).slice(2,10).toUpperCase();
+    localStorage.setItem(key, id);
+  }
+  return id + '-' + (navigator.language || 'xx');
+}
+function generateSecureCode(){ return Math.random().toString(36).slice(2,10).toUpperCase(); }
+function setLastUpdated(){
+  lastUpdatedEl.textContent = 'Last updated: ' + new Date().toLocaleString();
+}
+
+/* ============================
+   API: Registrations & Security
+   ============================ */
+async function fetchRegistrations(){
+  try{
+    const res = await fetch(SHEETDB_URL);
+    if(!res.ok) throw new Error('Failed to fetch registrations');
+    const data = await res.json();
+    members = data.map(item => ({
+      FullName: item.FullName || item.fullname || '',
+      phoneNumber: item.phoneNumber || item.phone || '',
+      address: item.address || '',
+      ward: item.ward || '',
+      pollingUnit: item.pollingUnit || item.unit || '',
+      vin: item.vin || ''
+    }));
+  }catch(e){
+    console.error('fetchRegistrations', e);
+    members = [];
+  }
+}
+
+async function fetchSecurityAssignments(){
+  try{
+    const res = await fetch(SECURITY_SHEETDB_URL);
+    if(!res.ok) throw new Error('Failed to fetch security DB');
+    assignedRecords = await res.json();
+  }catch(e){
+    console.error('fetchSecurityAssignments', e);
+    assignedRecords = [];
+  } finally {
+    setLastUpdated();
+  }
+}
+
+function getAssignment(fullname, ward){
+  return assignedRecords.find(r => (r.fullname||'').trim() === (fullname||'').trim() && (r.ward||'').trim() === (ward||'').trim());
+}
+
+/* Assign to security DB */
+async function assignCode(fullname, ward){
+  const secure = generateSecureCode();
+  const dev = deviceId();
+
+  if(!confirm(`Assign secure code?\n\nName: ${fullname}\nWard: ${ward}\nCode (auto): ${secure}\n\nProceed?`)) return;
+
+  const payload = [{ fullname, secure_code: secure, ward, device_id: dev }];
+
+  const res = await fetch(SECURITY_SHEETDB_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  if(!res.ok) {
+    alert('Failed to assign (server error)');
+    console.error('assignCode failed', res);
+    return;
+  }
+  await fetchSecurityAssignments();
+  renderTable();
+  toggleAssignRevoke(fullname, ward);
+  alert(`Assigned\nName: ${fullname}\nWard: ${ward}\nCode: ${secure}`);
+}
+
+/* Revoke from security DB (delete by fullname + ward) */
+async function revokeByFullnameWard(fullname, ward){
+  if(!confirm(`Revoke access?\n\nName: ${fullname}\nWard: ${ward}\n\nThis will remove their device record.\nProceed?`)) return;
+
+  const url = `${SECURITY_SHEETDB_URL}/search?fullname=${encodeURIComponent(fullname)}&ward=${encodeURIComponent(ward)}`;
+  const res = await fetch(url, { method: 'DELETE' });
+  if(!res.ok){
+    alert('Failed to revoke (server error)');
+    console.error('revoke failed', res);
+    return;
+  }
+  await fetchSecurityAssignments();
+  renderTable();
+  toggleAssignRevoke(fullname, ward);
+  alert(`Revoked access for ${fullname} (${ward})`);
+}
+
+/* Save a general code for the ward (optional) */
+async function saveGeneralCode(ward, code){
+  if(!ward || !code) { alert('Ward and code required'); return; }
+  try {
+    const check = await fetch(`${CODES_SHEET_URL}/search?ward=${encodeURIComponent(ward)}`).then(r=>r.json());
+    if(Array.isArray(check) && check.length){
+      await fetch(`${CODES_SHEET_URL}/ward/${encodeURIComponent(ward)}`, {
+        method: 'PATCH', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ code })
+      });
+      alert(`General code updated for ${ward}`);
+    } else {
+      await fetch(CODES_SHEET_URL, {
+        method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify([{ ward, code }])
+      });
+      alert(`General code saved for ${ward}`);
+    }
+  } catch(e){
+    console.error('saveGeneralCode', e);
+    alert('Failed to save general code.');
+  }
+}
+
+/* ============================
+   RENDERING & UI
+   ============================ */
+function populateFilters(){
+  const wards = Array.from(new Set(members.map(m => m.ward).filter(Boolean))).sort();
+  const units = Array.from(new Set(members.map(m => m.pollingUnit).filter(Boolean))).sort();
+
+  wardSel.innerHTML = '<option value="">— Filter by Ward —</option>' + wards.map(w=>`<option>${escapeHtml(w)}</option>`).join('');
+  unitSel.innerHTML = '<option value="">— Filter by Polling Unit —</option>' + units.map(u=>`<option>${escapeHtml(u)}</option>`).join('');
+}
+
+function renderTable(){
+  const q = (searchEl.value||'').toLowerCase().trim();
+  const wardFilter = wardSel.value;
+  const unitFilter = unitSel.value;
+
+  const filtered = members.filter(m=>{
+    if(wardFilter && m.ward !== wardFilter) return false;
+    if(unitFilter && m.pollingUnit !== unitFilter) return false;
+    if(q && !m.FullName.toLowerCase().includes(q) && !m.phoneNumber.includes(q)) return false;
+    return true;
+  });
+
+  tbody.innerHTML = filtered.map(m=>{
+    const assigned = getAssignment(m.FullName, m.ward);
+    const code = assigned ? (assigned.secure_code || '') : '';
+
+    const actionHtml = assigned
+      ? `<div class="table-actions">
+           <button class="btn danger revokeBtn" data-name="${encodeURIComponent(m.FullName)}" data-ward="${encodeURIComponent(m.ward)}">Revoke</button>
+         </div>`
+      : `<div class="table-actions">
+           <button class="btn primary assignBtn" data-name="${encodeURIComponent(m.FullName)}" data-ward="${encodeURIComponent(m.ward)}">Assign</button>
+         </div>`;
+
+    return `<tr>
+      <td>${escapeHtml(m.FullName)}</td>
+      <td>${escapeHtml(m.phoneNumber)}</td>
+      <td>${escapeHtml(m.address)}</td>
+      <td>${escapeHtml(m.ward)}</td>
+      <td>${escapeHtml(m.pollingUnit)}</td>
+      <td>${escapeHtml(m.vin)}</td>
+      <td>${escapeHtml(code)}</td>
+      <td>${actionHtml}</td>
+    </tr>`;
+  }).join('');
+
+  // attach handlers
+  document.querySelectorAll('.assignBtn').forEach(b=>{
+    b.addEventListener('click', async (e)=>{
+      const name = decodeURIComponent(e.currentTarget.dataset.name);
+      const ward = decodeURIComponent(e.currentTarget.dataset.ward);
+      assignFullnameInput.value = name;
+      assignWardInput.value = ward;
+      if(getAssignment(name, ward)){ alert('Already assigned.'); return; }
+      try{ await assignCode(name, ward); }catch(err){ console.error(err); alert('Failed to assign.'); }
+    });
+  });
+
+  document.querySelectorAll('.revokeBtn').forEach(b=>{
+    b.addEventListener('click', async (e)=>{
+      const name = decodeURIComponent(e.currentTarget.dataset.name);
+      const ward = decodeURIComponent(e.currentTarget.dataset.ward);
+      assignFullnameInput.value = name;
+      assignWardInput.value = ward;
+      if(!getAssignment(name, ward)){ alert('No assignment found.'); return; }
+      try{ await revokeByFullnameWard(name, ward); }catch(err){ console.error(err); alert('Failed to revoke.'); }
+    });
+  });
+
+  toggleAssignRevoke(assignFullnameInput.value.trim(), assignWardInput.value.trim());
+}
+
+function toggleAssignRevoke(fullname, ward){
+  const has = fullname && ward && getAssignment(fullname, ward);
+  assignUserBtn.disabled = !!has;
+  revokeUserBtn.disabled = !has;
+}
+
+/* ============================
+   SIDE PANEL BUTTONS
+   ============================ */
+assignUserBtn.addEventListener('click', async ()=>{
+  const name = assignFullnameInput.value.trim();
+  const ward = assignWardInput.value.trim();
+  if(!name || !ward){ alert('Enter Fullname and Ward. Tip: click a row button to auto-fill.'); return; }
+  if(getAssignment(name, ward)){ alert('Already assigned.'); return; }
+  try{ await assignCode(name, ward); }catch(err){ console.error(err); alert('Failed to assign.'); }
+});
+
+revokeUserBtn.addEventListener('click', async ()=>{
+  const name = assignFullnameInput.value.trim();
+  const ward = assignWardInput.value.trim();
+  if(!name || !ward){ alert('Enter Fullname and Ward to revoke.'); return; }
+  if(!getAssignment(name, ward)){ alert('No assignment found.'); return; }
+  try{ await revokeByFullnameWard(name, ward); }catch(err){ console.error(err); alert('Failed to revoke.'); }
+});
+
+document.getElementById('assignGeneralBtn').addEventListener('click', async ()=>{
+  const ward = assignWardInput.value.trim();
+  const code = document.getElementById('assignGeneralCode').value.trim();
+  if(!ward || !code){ alert('Enter Ward and General Code.'); return; }
+  await saveGeneralCode(ward, code);
+  document.getElementById('assignGeneralCode').value = '';
+});
+
+/* ============================
+   PDF PREVIEW & PRINT
+   ============================ */
+function getFilteredRows(){
+  const q = (searchEl.value||'').toLowerCase().trim();
+  const wardFilter = wardSel.value;
+  const unitFilter = unitSel.value;
+
+  return members.filter(m=>{
+    if(wardFilter && m.ward !== wardFilter) return false;
+    if(unitFilter && m.pollingUnit !== unitFilter) return false;
+    if(q && !m.FullName.toLowerCase().includes(q) && !m.phoneNumber.includes(q)) return false;
+    return true;
+  }).map(m=>{
+    const a = getAssignment(m.FullName, m.ward);
+    return [m.FullName, m.phoneNumber, m.address, m.ward, m.pollingUnit, m.vin, a ? (a.secure_code||'') : ''];
+  });
+}
+
+previewPdfBtn.addEventListener('click', ()=>{
+  const rows = getFilteredRows();
+  if(!rows.length){ alert('No records to preview.'); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'pt', format:'a4' });
+  doc.setFontSize(14);
+  doc.text('Registrations', 40, 40);
+  doc.autoTable({ startY:60, head: [['FullName','Phone','Address','Ward','Polling Unit','VIN','Secure Code']], body: rows, styles:{ fontSize:9 } });
+  window.open(doc.output('bloburl'), '_blank');
+});
+
+printPdfBtn.addEventListener('click', ()=>{
+  const rows = getFilteredRows();
+  if(!rows.length){ alert('No records to print.'); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'pt', format:'a4' });
+  doc.setFontSize(14);
+  doc.text('Registrations', 40, 40);
+  doc.autoTable({ startY:60, head: [['FullName','Phone','Address','Ward','Polling Unit','VIN','Secure Code']], body: rows, styles:{ fontSize:9 } });
+  doc.autoPrint();
+  const blobUrl = doc.output('bloburl');
+  const w = window.open(blobUrl, '_blank');
+  if(!w) alert('Popup blocked. Please allow popups to print.');
+});
+
+/* ============================
+   REFRESH & AUTO-REFRESH
+   ============================ */
+refreshBtn.addEventListener('click', async ()=>{
+  refreshBtn.disabled = true;
+  try{
+    await Promise.all([fetchRegistrations(), fetchSecurityAssignments()]);
+    populateFilters();
+    renderTable();
+  }catch(e){ console.error('manual refresh failed', e); alert('Failed to refresh.'); }
+  refreshBtn.disabled = false;
+});
+
+let autoRefresh = null;
+function startAutoRefresh(){
+  if(autoRefresh) clearInterval(autoRefresh);
+  autoRefresh = setInterval(async ()=>{
+    try{
+      await fetchSecurityAssignments();
+      renderTable();
+    }catch(e){ console.error('auto refresh failed', e); }
+  }, AUTO_REFRESH_MS);
+}
+
+/* ============================
+   EVENTS & INIT
+   ============================ */
+searchEl.addEventListener('input', debounce(()=> renderTable(), 220));
+wardSel.addEventListener('change', ()=> { renderTable(); toggleAssignRevoke(assignFullnameInput.value.trim(), assignWardInput.value.trim()); });
+unitSel.addEventListener('change', ()=> { renderTable(); });
+
+(async function init(){
+  try{
+    await Promise.all([fetchRegistrations(), fetchSecurityAssignments()]);
+    populateFilters();
+    renderTable();
+    startAutoRefresh();
+  }catch(e){
+    console.error('init error', e);
+    alert('Failed to load data.');
+  }
+})();
+
+/* ============================
+   Accessibility niceties:
+   - close settings on ESC
+   ============================ */
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){
+    settingsMenu.classList.remove('open');
+  }
+});
+</script>
+</body>
+</html>
