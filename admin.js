@@ -1,8 +1,8 @@
 // ===============================
 // CONFIGURATION
 // ===============================
-const SHEETDB_URL = 'https://sheetdb.io/api/v1/ji8u767etbjge';
-const CODES_SHEET_URL = "https://sheetdb.io/api/v1/45mblkhz4vrjc"; // Replace with your codes sheet ID
+const SHEETDB_URL = 'https://sheetdb.io/api/v1/e9qnjvkqmqm92';
+const CODES_SHEET_URL = "https://sheetdb.io/api/v1/2w4yqhf27pr15"; // Replace with your codes sheet ID
 
 // ===============================
 // LOCAL STORAGE FOR CODES
